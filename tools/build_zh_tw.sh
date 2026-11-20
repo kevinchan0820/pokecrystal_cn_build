@@ -34,6 +34,12 @@ python3 tools/zh_tw_prepare.py \
 python3 tools/zh_tw_static.py \
   --source pokecrystal_cn \
   --report zh_tw_static_report.json
+# Context-scoped editorial wording applied AFTER OpenCC, BEFORE font generation.
+python3 tools/zh_tw_locale.py \
+  --source pokecrystal_cn \
+  --workbook text.zh-TW.xlsx \
+  --rules data/zh_tw_locale.json \
+  --report zh_tw_locale_report.json
 python3 tools/zh_tw_font.py \
   --source pokecrystal_cn \
   --workbook text.zh-TW.xlsx \
