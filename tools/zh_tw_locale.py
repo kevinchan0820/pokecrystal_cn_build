@@ -74,13 +74,30 @@ def apply(root: Path, workbook: Path, rules_file: Path, report: Path):
         if not target.is_file():
             raise FileNotFoundError(f"Missing localized UI source: {target}")
         count = substitute_exact_asm(target, rule["from"], rule["to"])
-        if count != 1:
+        status = "replaced"
+        if count == 0:
+            # OpenCC phrase mode may have already chosen the desired Taiwan
+            # wording; still require a single exact quoted UI string.
+            existing = sum(
+                1 for line in target.read_text(encoding="utf-8").splitlines()
+                if not line.lstrip().startswith(";")
+                for m in QUOTED.finditer(line.split(";", 1)[0])
+                if m.group(1) == rule["to"]
+            )
+            if existing == 1:
+                status = "already-localized"
+            else:
+                raise ValueError(
+                    f"Rule {rule['id']} found neither its source string nor "
+                    f"one exact expected target string (found {existing})."
+                )
+        elif count != 1:
             raise ValueError(
                 f"Rule {rule['id']} expected exactly one UI string; found {count}. "
                 "Review the source/translation instead of silently skipping."
             )
         results.append({"id": rule["id"], "path": rule["path"], "count": count,
-                        "old": rule["from"], "new": rule["to"]})
+                        "status": status, "old": rule["from"], "new": rule["to"]})
 
     flagged = Counter()
     samples = []
