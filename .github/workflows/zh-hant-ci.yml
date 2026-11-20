@@ -1,14 +1,51 @@
-name: Traditional Chinese build checks
+name: Traditional Chinese Crystal build
 on:
   workflow_dispatch:
   push:
     branches:
       - work/zh-hant-tw
+  pull_request:
+    branches:
+      - master
+
+permissions:
+  contents: read
+
 jobs:
-  check:
-    runs-on: ubuntu-latest
+  translate-and-build:
+    name: Generate zh-Hant text, fonts, and compile
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
         with:
           submodules: recursive
-      - run: python3 --version
+          fetch-depth: 0
+      - name: Set up system build tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gcc make git bison libpng-dev pkg-config rsync fonts-noto-cjk
+          python3 -m venv .venv
+          .venv/bin/python -m pip install --upgrade pip
+          .venv/bin/python -m pip install openpyxl opencc-python-reimplemented Pillow
+      - name: Syntax check all Python helpers
+        run: .venv/bin/python -m compileall -q tools
+      - name: Create translated workbook and compile ROM
+        shell: bash
+        run: |
+          source .venv/bin/activate
+          bash tools/build_zh_tw.sh 2>&1 | tee zh_tw_build.log
+      - name: Record ROM checksums (do not upload copyrighted ROM)
+        if: success()
+        run: find build -maxdepth 1 -name '*.gbc' -type f -exec sha256sum {} \; > zh_tw_rom_sha256.txt
+      - name: Upload diagnostics and translated workbook only
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: zh-hant-translated-text-and-build-reports
+          path: |
+            text.zh-TW.xlsx
+            zh_tw_*_report.json
+            zh_tw_build.log
+            zh_tw_rom_sha256.txt
+          if-no-files-found: warn
