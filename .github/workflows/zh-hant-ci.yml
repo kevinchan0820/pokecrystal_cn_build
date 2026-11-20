@@ -4,9 +4,10 @@ on:
   push:
     branches:
       - work/zh-hant-tw
-  pull_request:
-    branches:
-      - master
+
+concurrency:
+  group: zh-hant-build-work
+  cancel-in-progress: true
 
 permissions:
   contents: read
