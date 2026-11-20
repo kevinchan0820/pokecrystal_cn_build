@@ -61,7 +61,7 @@ jobs:
             zh_tw_*_report.json
             zh_tw_build.log
             zh_tw_rom_sha256.txt
-            zh_tw_boot_*.png
+            zh_tw_*.png
             zh_tw_emulator_report.json
             Crystal_Traditional_Chinese_v1.1.ips
             zh_tw_patch_manifest.json
