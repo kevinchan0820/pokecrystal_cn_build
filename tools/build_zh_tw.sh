@@ -24,6 +24,8 @@ fi
 # The submodule is normally pinned; select the translation work branch explicitly.
 git -C pokecrystal_cn fetch origin work/zh-hant-tw
 git -C pokecrystal_cn checkout --detach FETCH_HEAD
+# Fail before building if the original Simplified title graphic is still present.
+python3 tools/zh_tw_title_check.py
 python3 tools/zh_tw_prepare.py \
   --input text.xlsx \
   --output text.zh-TW.xlsx \
