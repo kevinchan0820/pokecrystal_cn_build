@@ -43,7 +43,7 @@ def available_glyphs(chinese_charmap):
     return characters
 
 
-def prepare(source, charmap, output, report_path, conversion, overrides, species_file):
+def prepare(source, charmap, output, report_path, conversion, overrides, species_file, audit_only=False):
     supported = available_glyphs(charmap)
     converter = OpenCC(conversion)
     workbook = load_workbook(source)
@@ -80,13 +80,15 @@ def prepare(source, charmap, output, report_path, conversion, overrides, species
         if not isinstance(cell.value, str) or not cell.value:
             continue
         original = cell.value
-        translated = converter.convert(original)
-        if names and sheet.title == "宝" and column == 4 and 2 <= row <= 252:
-            translated = names[row - 2]
-        elif name_regex:
-            translated = name_regex.sub(lambda match: name_mapping[match.group()], translated)
-        for old, new in sorted(overrides.items(), key=lambda kv: -len(kv[0])):
-            translated = translated.replace(old, new)
+        translated = original
+        if not audit_only:
+            translated = converter.convert(original)
+            if names and sheet.title == "宝" and column == 4 and 2 <= row <= 252:
+                translated = names[row - 2]
+            elif name_regex:
+                translated = name_regex.sub(lambda match: name_mapping[match.group()], translated)
+            for old, new in sorted(overrides.items(), key=lambda kv: -len(kv[0])):
+                translated = translated.replace(old, new)
         scanned[sheet.title] += 1
         if translated != original:
             cell.value = translated
@@ -144,6 +146,8 @@ def main():
                         default=Path("data/pokemon_zh_hant_251.json"))
     parser.add_argument("--strict", action="store_true",
                         help="Exit nonzero when Unicode characters lack a charmap entry")
+    parser.add_argument("--audit-only", action="store_true",
+                        help="Inspect workbook without converting its text a second time")
     options = parser.parse_args()
     replacements = {}
     if options.overrides:
@@ -153,7 +157,8 @@ def main():
                 for k, v in replacements.items()):
             parser.error("--overrides must be a JSON object of string-to-string replacements")
     result = prepare(options.input, options.charmap, options.output,
-                     options.report, options.opencc, replacements, options.species)
+                     options.report, options.opencc, replacements,
+                     options.species, options.audit_only)
     print(f"Scanned {result['scanned_cells']} cells; modified "
           f"{result['changed_cells']}; missing glyphs: {result['missing_unique_count']}. "
           f"Report: {options.report}")
