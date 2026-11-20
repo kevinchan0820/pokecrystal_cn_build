@@ -28,7 +28,7 @@ def usage(source, workbook):
     used = set()
     book = load_workbook(workbook, read_only=True, data_only=True)
     for sheet in book:
-        if sheet.title in {"宝", "训", "类", "城", "道", "招"}:
+        if sheet.title in {"宝", "训", "类", "城", "道", "招", "其"}:
             index = 3
         elif sheet.title in {"图"}:
             index = 4
