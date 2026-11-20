@@ -28,7 +28,7 @@ jobs:
           sudo apt-get install -y gcc make git bison libpng-dev pkg-config rsync fonts-noto-cjk
           python3 -m venv .venv
           .venv/bin/python -m pip install --upgrade pip
-          .venv/bin/python -m pip install openpyxl opencc-python-reimplemented Pillow
+          .venv/bin/python -m pip install openpyxl opencc-python-reimplemented Pillow pyboy
       - name: Syntax check all Python helpers
         run: .venv/bin/python -m compileall -q tools
       - name: Create translated workbook and compile ROM
@@ -36,6 +36,10 @@ jobs:
         run: |
           source .venv/bin/activate
           bash tools/build_zh_tw.sh 2>&1 | tee zh_tw_build.log
+      - name: Headless GBC emulator smoke test
+        if: success()
+        run: |
+          .venv/bin/python tools/zh_tw_smoke.py build/pokecrystal11.gbc --output .
       - name: Record ROM checksums (do not upload copyrighted ROM)
         if: success()
         run: find build -maxdepth 1 -name '*.gbc' -type f -exec sha256sum {} \; > zh_tw_rom_sha256.txt
@@ -49,4 +53,6 @@ jobs:
             zh_tw_*_report.json
             zh_tw_build.log
             zh_tw_rom_sha256.txt
+            zh_tw_boot_*.png
+            zh_tw_emulator_report.json
           if-no-files-found: warn
