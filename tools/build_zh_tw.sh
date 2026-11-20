@@ -37,6 +37,13 @@ python3 tools/zh_tw_font.py \
   --workbook text.zh-TW.xlsx \
   --font "$FONT_FILE" \
   --report zh_tw_font_report.json
+# Validate the final workbook against the REMAPPED charmap before building.
+python3 tools/zh_tw_prepare.py \
+  --input text.zh-TW.xlsx \
+  --charmap pokecrystal_cn/constants/charmap_cn.asm \
+  --species data/pokemon_zh_hant_251.json \
+  --report zh_tw_postfont_report.json \
+  --strict
 
 # The importer does not automatically know which sheet is the translated draft.
 export PMC_TEXT_XLSX="./text.zh-TW.xlsx"
