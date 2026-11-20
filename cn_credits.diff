@@ -127,15 +127,15 @@ index c3a502088..d4b3c294d 100644
  .UsCoordination:      db "  US COORDINATION@"
  .TextTranslation:     db "  TEXT TRANSLATION@"
  .PaadTesting:         db "    PAAD TESTING@"
-+.CnVersionStaff:      db "  CN VERSION STAFF@"        ; 中文版制作人员
-+.CnProgrammer:        db "     PROGRAMMER@"           ; 程序（单数）
-+.CnVersionTesting:    db " CN VERSION TESTING@"       ; 中文版测试
-+.CnPigPigZero:        db "     PIGPIGZERO@"           ; 萌萌猪猪灵
-+.CnInvincibleArceus:  db " INVINCIBLE ARCEUS@"        ; 无敌阿尔宙斯
-+.CnOnionRedmage:      db "   ONION REDMAGE@"          ; 吃馍法师
++.CnVersionStaff:      db "  CN VERSION STAFF@"        ; 中文版製作人員
++.CnProgrammer:        db "     PROGRAMMER@"           ; 程式（單數）
++.CnVersionTesting:    db " CN VERSION TESTING@"       ; 中文版測試
++.CnPigPigZero:        db "     PIGPIGZERO@"           ; 萌萌豬豬靈
++.CnInvincibleArceus:  db " INVINCIBLE ARCEUS@"        ; 無敵阿爾宙斯
++.CnOnionRedmage:      db "   ONION REDMAGE@"          ; 吃饃法師
 +.CnYibububu:          db "      YIBUBUBU@"            ; 伊布布布
 +.CnSnDream:           db "      SNDREAM@"             ; 星夜之幻
-+.CnChrisZ:            db "      CHRIS.Z@"             ; Chris溢权
++.CnChrisZ:            db "      CHRIS.Z@"             ; Chris溢權
 +.CnNinsonytendog:     db "   NINSONYTENDOG@"          ; 任索尼舔狗
  
  .Copyright:
@@ -169,18 +169,18 @@ index 4bf8cc2f0..611007df9 100644
  	text_end
  
 +ChineseVersionText:
-+	text " 《精灵宝可梦 水晶版》"
-+	line "    汉化版 V1.2"
-+	cont "萌萌猪猪灵 :翻译、测试"
-+	cont "无敌阿尔宙斯:测试、翻译"
-+	cont "吃馍法师   :测试、翻译"
-+	cont "伊布布布   :翻译"
-+	cont "星夜之幻   :程序、美工"
-+	cont "Chris溢权 :美工"
-+	cont "任索尼舔狗 :测试"
++	text " 《精靈寶可夢 水晶版》"
++	line "    繁體版 V1.2"
++	cont "萌萌豬豬靈 :翻譯、測試"
++	cont "無敵阿爾宙斯:測試、翻譯"
++	cont "吃饃法師   :測試、翻譯"
++	cont "伊布布布   :翻譯"
++	cont "星夜之幻   :程式、美術"
++	cont "Chris溢權 :美術"
++	cont "任索尼舔狗 :測試"
 +
 +	para "CKN/DMG/口袋群星SP"
-+	line "联合汉化  2022.06.12"
++	line "聯合漢化  2022.06.12"
 +
 +	prompt
 +	text_end
