@@ -1,6 +1,7 @@
 [submodule "pokecrystal_cn"]
 	path = pokecrystal_cn
-	url = https://github.com/SnDream/pokecrystal_cn.git
+	url = https://github.com/kevinchan0820/pokecrystal_cn.git
+	branch = work/zh-hant-tw
 [submodule "rgbds"]
 	path = rgbds
 	url = https://github.com/gbdev/rgbds.git
