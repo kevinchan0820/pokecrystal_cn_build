@@ -60,7 +60,7 @@ def audit(root: Path, conversion: str) -> dict:
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--source", type=Path, default=Path("build"))
-    parser.add_argument("--report", type=Path, default=Path("zh_tw_menu_audit.json"))
+    parser.add_argument("--report", type=Path, default=Path("zh_tw_menu_audit_report.json"))
     parser.add_argument("--opencc", default="s2twp")
     args = parser.parse_args()
     result = audit(args.source, args.opencc)
