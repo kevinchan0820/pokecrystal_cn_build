@@ -35,6 +35,7 @@ python3 tools/zh_tw_static.py \
 python3 tools/zh_tw_font.py \
   --source pokecrystal_cn \
   --workbook text.zh-TW.xlsx \
+  --extra-text cn_credits.diff \
   --font "$FONT_FILE" \
   --report zh_tw_font_report.json
 # Validate the final workbook against the REMAPPED charmap before building.
