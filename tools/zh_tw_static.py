@@ -10,6 +10,30 @@ from opencc import OpenCC
 QUOTED = re.compile(r'"((?:[^"\\]|\\.)*)"')
 SKIP = {"constants/charmap_cn.asm", "constants/charmap.asm", "macros/charmap_w.asm"}
 TEXT_DIRECTIVES = ("db_w", "li", "text", "line", "cont", "next", "para", "db")
+# Source text often has a label and a text directive on the SAME line:
+#   .PokedexString: db_w "图鉴@"
+# The old first-token-only check saw ".PokedexString:" and silently missed it.
+DISPLAY_LINE = re.compile(
+    r"^\\s*(?:(?:[A-Za-z_.][A-Za-z0-9_.$@]*)(?:::|:)\\s*)?"
+    r"(?:" + "|".join(TEXT_DIRECTIVES) + r")(?=\\s|$)"
+)
+
+
+def separate_comment(line):
+    """Keep comments intact, including when a quoted text contains ';'."""
+    quoted = False
+    escaped = False
+    for i, char in enumerate(line):
+        if char == '"' and not escaped:
+            quoted = not quoted
+        if char == ";" and not quoted:
+            return line[:i], line[i:]
+        if char == "\\\\" and not escaped:
+            escaped = True
+        else:
+            escaped = False
+    return line, ""
+
 
 
 def rewrite(source, config):
@@ -23,19 +47,17 @@ def rewrite(source, config):
         new_lines = []
         lines_edited = 0
         for line in old_lines:
-            stripped = line.lstrip()
-            directive = stripped.split(None, 1)[0] if stripped.split() else ""
-            if stripped.startswith(";") or directive not in TEXT_DIRECTIVES:
+            if not DISPLAY_LINE.match(line):
                 new_lines.append(line)
                 continue
-            # Transform quoted Chinese text only. Leave path names, labels,
-            # token/control syntax and quotation escaping untouched.
+            # Translate the command text, not any quoted wording in a comment.
+            code, comment = separate_comment(line)
             def convert(m):
                 text = m.group(1)
                 if not any("\u3400" <= ch <= "\u9fff" for ch in text):
                     return m.group(0)
                 return '"' + converter.convert(text) + '"'
-            updated = QUOTED.sub(convert, line)
+            updated = QUOTED.sub(convert, code) + comment
             if updated != line:
                 lines_edited += 1
             new_lines.append(updated)
