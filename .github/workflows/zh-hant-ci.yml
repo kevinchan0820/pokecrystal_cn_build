@@ -40,6 +40,12 @@ jobs:
         if: success()
         run: |
           .venv/bin/python tools/zh_tw_smoke.py build/pokecrystal11.gbc --output .
+      - name: Build verified clean Crystal and generate a patch
+        if: success()
+        run: |
+          git clone --depth 1 https://github.com/pret/pokecrystal.git clean_crystal
+          make -C clean_crystal -j2 crystal11
+          .venv/bin/python tools/zh_tw_ips.py clean_crystal/pokecrystal11.gbc build/pokecrystal11.gbc
       - name: Record ROM checksums (do not upload copyrighted ROM)
         if: success()
         run: find build -maxdepth 1 -name '*.gbc' -type f -exec sha256sum {} \; > zh_tw_rom_sha256.txt
@@ -55,4 +61,6 @@ jobs:
             zh_tw_rom_sha256.txt
             zh_tw_boot_*.png
             zh_tw_emulator_report.json
+            Crystal_Traditional_Chinese_v1.1.ips
+            zh_tw_patch_manifest.json
           if-no-files-found: warn
