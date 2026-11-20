@@ -43,10 +43,33 @@ def available_glyphs(chinese_charmap):
     return characters
 
 
-def prepare(source, charmap, output, report_path, conversion, overrides):
+def prepare(source, charmap, output, report_path, conversion, overrides, species_file):
     supported = available_glyphs(charmap)
     converter = OpenCC(conversion)
     workbook = load_workbook(source)
+    if species_file:
+        names = json.loads(species_file.read_text(encoding="utf-8"))["names"]
+        if len(names) != 251 or len(set(names)) != 251:
+            raise ValueError("Species names file must contain exactly 251 unique indexed names")
+        pokemon_sheet = workbook["宝"]
+        original_names = {
+            pokemon_sheet.cell(row=i + 2, column=4).value: names[i]
+            for i in range(251)
+        }
+        original_names.update({
+            converter.convert(old): new for old, new in list(original_names.items())
+        })
+        # Longer species names first so substrings such as "伊布" do not shadow "水伊布".
+        name_pairs = sorted(
+            ((old, new) for old, new in original_names.items() if old and new),
+            key=lambda p: (-len(p[0]), p[0]),
+        )
+        name_regex = re.compile("|".join(re.escape(old) for old, _ in name_pairs))
+        name_mapping = dict(name_pairs)
+    else:
+        names = []
+        name_regex = None
+        name_mapping = {}
     scanned = Counter()
     missing = Counter()
     examples = []
@@ -58,7 +81,11 @@ def prepare(source, charmap, output, report_path, conversion, overrides):
             continue
         original = cell.value
         translated = converter.convert(original)
-        for old, new in overrides.items():
+        if names and sheet.title == "宝" and column == 4 and 2 <= row <= 252:
+            translated = names[row - 2]
+        elif name_regex:
+            translated = name_regex.sub(lambda match: name_mapping[match.group()], translated)
+        for old, new in sorted(overrides.items(), key=lambda kv: -len(kv[0])):
             translated = translated.replace(old, new)
         scanned[sheet.title] += 1
         if translated != original:
@@ -113,6 +140,8 @@ def main():
     parser.add_argument("--report", type=Path, default=Path("zh_tw_report.json"))
     parser.add_argument("--opencc", default="s2twp")
     parser.add_argument("--overrides", type=Path, default=None)
+    parser.add_argument("--species", type=Path,
+                        default=Path("data/pokemon_zh_hant_251.json"))
     parser.add_argument("--strict", action="store_true",
                         help="Exit nonzero when Unicode characters lack a charmap entry")
     options = parser.parse_args()
@@ -124,7 +153,7 @@ def main():
                 for k, v in replacements.items()):
             parser.error("--overrides must be a JSON object of string-to-string replacements")
     result = prepare(options.input, options.charmap, options.output,
-                     options.report, options.opencc, replacements)
+                     options.report, options.opencc, replacements, options.species)
     print(f"Scanned {result['scanned_cells']} cells; modified "
           f"{result['changed_cells']}; missing glyphs: {result['missing_unique_count']}. "
           f"Report: {options.report}")
