@@ -7,6 +7,7 @@ run save/menu/IME tests before shipping.
 """
 import argparse
 import json
+import unicodedata
 import re
 from pathlib import Path
 
@@ -37,7 +38,7 @@ def usage(source, workbook):
             continue
         for row in sheet.iter_rows(values_only=True):
             if len(row) > index and isinstance(row[index], str):
-                used.update(c for c in row[index] if han(c))
+                used.update(c for c in row[index] if ord(c) > 127)
     book.close()
 
     for file in source.rglob("*.asm"):
@@ -47,7 +48,7 @@ def usage(source, workbook):
             if line.lstrip().startswith(";"):
                 continue
             for match in QUOTES.finditer(line.split(";", 1)[0]):
-                used.update(c for c in match.group(1) if han(c))
+                used.update(c for c in match.group(1) if ord(c) > 127)
     return used
 
 
@@ -90,7 +91,8 @@ def build(root, workbook, fontname, report, pointsize):
     if len(codepoints) < 2000:
         raise ValueError("Missing original GB2312 character map")
     existing = {ch: (hi, lo) for ch, hi, lo in codepoints if len(ch) == 1}
-    required = usage(root, workbook)
+    all_needed = usage(root, workbook)
+    required = {char for char in all_needed if han(char)}
     converter = OpenCC("s2t")
     predecessor = {}
     for char, hi, lo in codepoints:
@@ -101,7 +103,19 @@ def build(root, workbook, fontname, report, pointsize):
             predecessor.setdefault(converted, []).append(char)
 
     available = [(ch, hi, lo) for ch, hi, lo in codepoints
-                 if han(ch) and ch not in required]
+                 if han(ch) and ch not in all_needed]
+    # The original GB2312 table also contains hundreds of unused symbol and
+    # private-use slots. All codepoints below are already valid for DFS. Use
+    # these only if no unneeded Chinese slots remain.
+    recyclable_symbols = [(ch, hi, lo) for ch, hi, lo in codepoints
+                          if len(ch) == 1 and not han(ch)
+                          and ch not in all_needed
+                          and unicodedata.category(ch) in
+                          {"Co", "No", "Nl", "So", "Sm", "Sk", "Sc"}]
+    recyclable_symbols.sort(key=lambda entry: (
+        0 if unicodedata.category(entry[0]) == "Co" else 1,
+        entry[1], entry[2]))
+    available.extend(recyclable_symbols)
     allocated = set()
     additions = {}
     failures = []
