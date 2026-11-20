@@ -266,14 +266,10 @@ def length_check(tb):
         else: length = 0
         cnr = False
         for char in line:
-            try:
-                if char == '啰':
-                    clen = 2
-                else:
-                    clen = len(char.encode(encoding='GB2312'))
-            except:
-                print(char, 'is not suppport', line, tb.dlabel)
-                clen = 1
+            # Chinese glyphs in this game's DFS encoding are always two
+            # bytes. GB2312 rejects many Traditional Chinese characters;
+            # silently treating such errors as one byte was incorrect.
+            clen = 2 if ord(char) > 127 else 1
             if clen == 2:
                 # chinese
                 if not cnr :
