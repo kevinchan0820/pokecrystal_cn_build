@@ -1,0 +1,69 @@
+{
+  "schema_version": 1,
+  "locale": "zh-Hant-TW",
+  "note": "Exact-match, context-scoped UI edits only. OpenCC s2twp runs before this stage. Full dialogue QA is separate.",
+  "ui_rules": [
+    {
+      "id": "start-menu-save",
+      "path": "engine/menus/start_menu.asm",
+      "from": "記錄@",
+      "to": "儲存@",
+      "reason": "Save command is an action. Taiwan game UI uses 儲存 rather than 記錄 for the control.",
+      "source_url": "https://support.nintendo.com/hk/switch2/mastery/accessibility/index.html"
+    },
+    {
+      "id": "main-menu-new-game",
+      "path": "engine/menus/main_menu.asm",
+      "from": "從頭開始@",
+      "to": "新遊戲@",
+      "reason": "Concise and natural title-menu label for starting a new save.",
+      "source_url": "https://tw.portal-pokemon.com/special/pika_vee/tc/howtoplay/"
+    },
+    {
+      "id": "options-print-density",
+      "path": "engine/menus/options_menu.asm",
+      "from": "打印濃度",
+      "to": "列印濃度",
+      "reason": "Taiwan Traditional Chinese calls printing 列印.",
+      "source_url": "https://support.nintendo.com/hk/switch2/mastery/accessibility/index.html"
+    }
+  ],
+  "editorial_review": [
+    {
+      "term": "初訓家",
+      "english": "Original Trainer (OT)",
+      "official_or_existing": "初訓家",
+      "proposed_plain_language": "原訓練家",
+      "status": "needs layout and usage review",
+      "source_url": "https://wiki.52poke.com/zh-hant/初訓家",
+      "note": "Existing Pokémon terminology, not a mainland-only mistranslation. Do not globally replace without display-width and save compatibility review."
+    },
+    {
+      "term": "拼音排序模式",
+      "status": "requires functional check",
+      "note": "Cannot rename to 注音排序 until sorting engine genuinely uses that order."
+    },
+    {
+      "term": "裝置",
+      "status": "requires game-system terminology review",
+      "note": "Pokegear should be compared with established Taiwan term, limited to available display width."
+    },
+    {
+      "term": "寶可夢訓練家",
+      "status": "keep",
+      "note": "Normal official Taiwan term; not a mainland-only expression."
+    }
+  ],
+  "review_flags": [
+    "信息",
+    "數據",
+    "打印",
+    "初訓家",
+    "網絡",
+    "軟件",
+    "存檔",
+    "從頭開始",
+    "記錄",
+    "拼音排序"
+  ]
+}
