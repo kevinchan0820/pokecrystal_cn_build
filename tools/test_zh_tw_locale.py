@@ -7,7 +7,7 @@ import tempfile
 import unittest
 from pathlib import Path
 from openpyxl import Workbook
-from zh_tw_locale import apply
+from zh_tw_locale import apply, apply_dialogue_phrases
 
 
 class LocaleRulesTest(unittest.TestCase):
@@ -50,6 +50,33 @@ class LocaleRulesTest(unittest.TestCase):
             modified.close()
             second = apply(source, workbook, settings, report)
             self.assertEqual(second["applied_ui_rules"][0]["status"], "already-localized")
+
+
+    def test_exact_cell_scope_rejects_wrong_count(self):
+        with tempfile.TemporaryDirectory() as folder:
+            workbook = Path(folder) / "text.xlsx"
+            book = Workbook()
+            sheet = book.active
+            sheet.title = "文1"
+            sheet["E2"] = "那啥"
+            sheet["E3"] = "那啥"
+            book.save(workbook)
+            changes = apply_dialogue_phrases(workbook, [{
+                "id": "one-scene", "scope": "dialogue", "sheet": "文1",
+                "cell": "E2", "from": "那啥", "to": "那麼",
+                "expected_count": 1,
+            }])
+            self.assertEqual(changes[0]["sample_cells"], ["文1!E2"])
+            result = __import__("openpyxl").load_workbook(workbook)
+            self.assertEqual(result["文1"]["E2"].value, "那麼")
+            self.assertEqual(result["文1"]["E3"].value, "那啥")
+            result.close()
+            with self.assertRaises(ValueError):
+                apply_dialogue_phrases(workbook, [{
+                    "id": "must-not-skip", "scope": "dialogue", "sheet": "文1",
+                    "cell": "E2", "from": "那啥", "to": "那麼",
+                    "expected_count": 1,
+                }])
 
 
 if __name__ == "__main__":
