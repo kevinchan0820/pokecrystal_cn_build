@@ -3,8 +3,9 @@
 from openpyxl import Workbook
 from openpyxl.comments import Comment
 from openpyxl import load_workbook
+import os
 
-wb = load_workbook('./text.xlsx', data_only=True)
+wb = load_workbook(os.environ.get('PMC_TEXT_XLSX', './text.xlsx'), data_only=True)
 
 # import pokemon name
 def import_pokemon():
