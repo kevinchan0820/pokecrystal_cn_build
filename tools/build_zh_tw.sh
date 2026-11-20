@@ -57,5 +57,7 @@ source ./env-setup
 pmc_isys
 pmc_init
 pmc_itext
+# Assert that compiled menu text (including inline-label db_w) is Traditional.
+python3 tools/zh_tw_menu_audit.py --source build --report zh_tw_menu_audit.json
 pmc_build
 echo "Build completed; review all zh_tw_*_report.json and test gameplay in emulator."
