@@ -44,7 +44,7 @@ jobs:
         if: success()
         run: |
           git clone --depth 1 https://github.com/pret/pokecrystal.git clean_crystal
-          make -C clean_crystal -j2 crystal11
+          make -C clean_crystal -j2 crystal11 RGBDS="$PWD/rgbds/"
           .venv/bin/python tools/zh_tw_ips.py clean_crystal/pokecrystal11.gbc build/pokecrystal11.gbc
       - name: Record ROM checksums (do not upload copyrighted ROM)
         if: success()
