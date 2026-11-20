@@ -96,7 +96,11 @@
     "存檔",
     "從頭開始",
     "記錄",
-    "拼音排序"
+    "拼音排序",
+    "效果拔群",
+    "好像效果不好",
+    "甭",
+    "啥"
   ],
   "workbook_phrase_rules": [
     {
@@ -106,6 +110,14 @@
       "to": "零用錢",
       "evidence": "Taiwan conventional usage and equivalent semantics",
       "source_url": "https://en.wiktionary.org/wiki/零用錢"
+    },
+    {
+      "id": "battle-not-very-effective",
+      "scope": "dialogue",
+      "from": "好像效果不好<……>",
+      "to": "效果不太好<……>",
+      "reason": "Niantic's Traditional Chinese Pokémon GO help explicitly calls the ineffective-hit message「效果不太好」; preserve the existing imported control token <……>.",
+      "source_url": "https://niantic.helpshift.com/hc/zh-hant/6-pokemon-go/faq/2132-type-effectiveness-in-battle/"
     }
   ]
 }
