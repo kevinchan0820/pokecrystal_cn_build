@@ -16,7 +16,7 @@ from openpyxl import load_workbook
 from opencc import OpenCC
 
 CHARMAP_RE = re.compile(r'^\s*charmap_w\s+"([^"]+)"\s*,', re.MULTILINE)
-NAMED_SHEETS = {"宝", "训", "类", "城", "道", "招"}
+NAMED_SHEETS = {"宝", "训", "类", "城", "道", "招", "其"}
 
 
 def translation_cells(workbook):
@@ -43,10 +43,16 @@ def available_glyphs(chinese_charmap):
     return characters
 
 
-def prepare(source, charmap, output, report_path, conversion, overrides, species_file, audit_only=False):
+def prepare(source, charmap, output, report_path, conversion, overrides, species_file, move_file, audit_only=False):
     supported = available_glyphs(charmap)
     converter = OpenCC(conversion)
     workbook = load_workbook(source)
+    if move_file:
+        move_names = json.loads(move_file.read_text(encoding="utf-8"))["names"]
+        if len(move_names) != 251 or not all(isinstance(x, str) and x for x in move_names):
+            raise ValueError("Move names file must contain 251 nonempty strings")
+    else:
+        move_names = []
     if species_file:
         names = json.loads(species_file.read_text(encoding="utf-8"))["names"]
         if len(names) != 251 or len(set(names)) != 251:
@@ -85,6 +91,8 @@ def prepare(source, charmap, output, report_path, conversion, overrides, species
             translated = converter.convert(original)
             if names and sheet.title == "宝" and column == 4 and 2 <= row <= 252:
                 translated = names[row - 2]
+            elif move_names and sheet.title == "招" and column == 4 and 2 <= row <= 252:
+                translated = move_names[row - 2]
             elif name_regex:
                 translated = name_regex.sub(lambda match: name_mapping[match.group()], translated)
             for old, new in sorted(overrides.items(), key=lambda kv: -len(kv[0])):
@@ -144,6 +152,8 @@ def main():
     parser.add_argument("--overrides", type=Path, default=None)
     parser.add_argument("--species", type=Path,
                         default=Path("data/pokemon_zh_hant_251.json"))
+    parser.add_argument("--moves", type=Path,
+                        default=Path("data/move_zh_hant_251.json"))
     parser.add_argument("--strict", action="store_true",
                         help="Exit nonzero when Unicode characters lack a charmap entry")
     parser.add_argument("--audit-only", action="store_true",
@@ -158,7 +168,7 @@ def main():
             parser.error("--overrides must be a JSON object of string-to-string replacements")
     result = prepare(options.input, options.charmap, options.output,
                      options.report, options.opencc, replacements,
-                     options.species, options.audit_only)
+                     options.species, options.moves, options.audit_only)
     print(f"Scanned {result['scanned_cells']} cells; modified "
           f"{result['changed_cells']}; missing glyphs: {result['missing_unique_count']}. "
           f"Report: {options.report}")
