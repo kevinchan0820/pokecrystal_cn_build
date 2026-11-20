@@ -40,6 +40,10 @@ python3 tools/zh_tw_locale.py \
   --workbook text.zh-TW.xlsx \
   --rules data/zh_tw_locale.json \
   --report zh_tw_locale_report.json
+# Verify the canonical Taiwanese battle message identities before compiling.
+python3 tools/zh_tw_battle_audit.py \
+  --workbook text.zh-TW.xlsx \
+  --report zh_tw_battle_audit_report.json
 python3 tools/zh_tw_font.py \
   --source pokecrystal_cn \
   --workbook text.zh-TW.xlsx \
