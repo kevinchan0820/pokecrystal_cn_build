@@ -78,17 +78,38 @@ def apply_dialogue_phrases(workbook: Path, rules):
                 raise ValueError("Unsupported workbook locale scope: " + str(rule.get("scope")))
             count = 0
             examples = []
-            for sheet in book:
-                if not re.fullmatch(r"文[1-9]", sheet.title):
-                    continue
-                for row in range(1, sheet.max_row + 1):
-                    cell = sheet.cell(row=row, column=5)
-                    if not isinstance(cell.value, str) or rule["from"] not in cell.value:
+            if "sheet" in rule or "cell" in rule:
+                # Target one reviewed line: never rewrite a similar-looking
+                # phrase spoken by another character in another scene.
+                sheet_name = rule.get("sheet")
+                address = rule.get("cell")
+                if not sheet_name or not address or sheet_name not in book:
+                    raise ValueError(f"Rule {rule['id']}: invalid sheet/cell selector")
+                cell = book[sheet_name][address]
+                if cell.column != 5 or not re.fullmatch(r"文[1-9]", sheet_name):
+                    raise ValueError(f"Rule {rule['id']}: only dialogue E cells may be edited")
+                if isinstance(cell.value, str):
+                    count = cell.value.count(rule["from"])
+                    if count:
+                        cell.value = cell.value.replace(rule["from"], rule["to"])
+                        examples.append(f"{sheet_name}!{cell.coordinate}")
+            else:
+                for sheet in book:
+                    if not re.fullmatch(r"文[1-9]", sheet.title):
                         continue
-                    count += cell.value.count(rule["from"])
-                    cell.value = cell.value.replace(rule["from"], rule["to"])
-                    if len(examples) < 20:
-                        examples.append(f"{sheet.title}!{cell.coordinate}")
+                    for row in range(1, sheet.max_row + 1):
+                        cell = sheet.cell(row=row, column=5)
+                        if not isinstance(cell.value, str) or rule["from"] not in cell.value:
+                            continue
+                        count += cell.value.count(rule["from"])
+                        cell.value = cell.value.replace(rule["from"], rule["to"])
+                        if len(examples) < 20:
+                            examples.append(f"{sheet.title}!{cell.coordinate}")
+            if "expected_count" in rule and count != rule["expected_count"]:
+                raise ValueError(
+                    f"Rule {rule['id']} expected {rule['expected_count']} edit(s), "
+                    f"found {count}; translation/source changed, review required."
+                )
             changes.append({
                 "id": rule["id"], "from": rule["from"], "to": rule["to"],
                 "count": count, "sample_cells": examples,
