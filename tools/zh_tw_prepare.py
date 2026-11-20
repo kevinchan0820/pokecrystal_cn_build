@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import unicodedata
 import re
 from collections import Counter
 from pathlib import Path
@@ -43,10 +44,13 @@ def available_glyphs(chinese_charmap):
     return characters
 
 
-def prepare(source, charmap, output, report_path, conversion, overrides, species_file, move_file, audit_only=False):
+def prepare(source, charmap, output, report_path, conversion, overrides, species_file, move_file, item_file, audit_only=False):
     supported = available_glyphs(charmap)
     converter = OpenCC(conversion)
     workbook = load_workbook(source)
+    item_names = {}
+    if item_file:
+        item_names = json.loads(item_file.read_text(encoding="utf-8"))["byEnglish"]
     if move_file:
         move_names = json.loads(move_file.read_text(encoding="utf-8"))["names"]
         if len(move_names) != 251 or not all(isinstance(x, str) and x for x in move_names):
@@ -93,6 +97,14 @@ def prepare(source, charmap, output, report_path, conversion, overrides, species
                 translated = names[row - 2]
             elif move_names and sheet.title == "招" and column == 4 and 2 <= row <= 252:
                 translated = move_names[row - 2]
+            elif sheet.title == "道" and column == 4 and item_names:
+                source_name = sheet.cell(row=row, column=2).value
+                if isinstance(source_name, str):
+                    normalized = "".join(ch for ch in unicodedata.normalize("NFKD", source_name)
+                                         if ord(ch) < 128 and ch.isalnum()).upper()
+                    found_name = item_names.get(normalized)
+                    if found_name and sum(2 if ord(c) > 127 else 1 for c in found_name) <= 12:
+                        translated = found_name
             elif name_regex:
                 translated = name_regex.sub(lambda match: name_mapping[match.group()], translated)
             for old, new in sorted(overrides.items(), key=lambda kv: -len(kv[0])):
@@ -154,6 +166,8 @@ def main():
                         default=Path("data/pokemon_zh_hant_251.json"))
     parser.add_argument("--moves", type=Path,
                         default=Path("data/move_zh_hant_251.json"))
+    parser.add_argument("--items", type=Path,
+                        default=Path("data/item_zh_hant_english.json"))
     parser.add_argument("--strict", action="store_true",
                         help="Exit nonzero when Unicode characters lack a charmap entry")
     parser.add_argument("--audit-only", action="store_true",
@@ -168,7 +182,7 @@ def main():
             parser.error("--overrides must be a JSON object of string-to-string replacements")
     result = prepare(options.input, options.charmap, options.output,
                      options.report, options.opencc, replacements,
-                     options.species, options.moves, options.audit_only)
+                     options.species, options.moves, options.items, options.audit_only)
     print(f"Scanned {result['scanned_cells']} cells; modified "
           f"{result['changed_cells']}; missing glyphs: {result['missing_unique_count']}. "
           f"Report: {options.report}")
