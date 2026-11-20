@@ -24,7 +24,7 @@ def han(ch):
     return len(ch) == 1 and ("\u3400" <= ch <= "\u9fff" or "\uf900" <= ch <= "\ufaff")
 
 
-def usage(source, workbook):
+def usage(source, workbook, extra_text=None):
     used = set()
     book = load_workbook(workbook, read_only=True, data_only=True)
     for sheet in book:
@@ -49,6 +49,13 @@ def usage(source, workbook):
                 continue
             for match in QUOTES.finditer(line.split(";", 1)[0]):
                 used.update(c for c in match.group(1) if ord(c) > 127)
+    if extra_text is not None:
+        # These extra strings are injected by cn_credits.diff after the font
+        # generation step. Include their glyphs before building the ROM.
+        for line in extra_text.read_text(encoding="utf-8").splitlines():
+            if line.startswith("+") and not line.startswith("+++"):
+                for match in QUOTES.finditer(line):
+                    used.update(ch for ch in match.group(1) if ord(ch) > 127)
     return used
 
 
@@ -83,7 +90,7 @@ def write_glyph(root, high, low, glyph):
     return str(file.relative_to(root))
 
 
-def build(root, workbook, fontname, report, pointsize):
+def build(root, workbook, fontname, report, pointsize, extra_text=None):
     file = root / "constants" / "charmap_cn.asm"
     original = file.read_text(encoding="utf-8")
     codepoints = [(m.group(1), int(m.group(2), 16), int(m.group(3), 16))
@@ -91,7 +98,7 @@ def build(root, workbook, fontname, report, pointsize):
     if len(codepoints) < 2000:
         raise ValueError("Missing original GB2312 character map")
     existing = {ch: (hi, lo) for ch, hi, lo in codepoints if len(ch) == 1}
-    all_needed = usage(root, workbook)
+    all_needed = usage(root, workbook, extra_text)
     required = {char for char in all_needed if han(char)}
     converter = OpenCC("s2t")
     predecessor = {}
@@ -167,10 +174,12 @@ def main():
     p.add_argument("--source", type=Path, default=Path("pokecrystal_cn"))
     p.add_argument("--workbook", type=Path, default=Path("text.zh-TW.xlsx"))
     p.add_argument("--font", required=True)
+    p.add_argument("--extra-text", type=Path, default=None,
+                   help="Patch text to include in glyph audit (e.g. cn_credits.diff)")
     p.add_argument("--size", type=int, default=12)
     p.add_argument("--report", type=Path, default=Path("zh_tw_font_report.json"))
     a = p.parse_args()
-    build(a.source, a.workbook, a.font, a.report, a.size)
+    build(a.source, a.workbook, a.font, a.report, a.size, a.extra_text)
 
 
 if __name__ == "__main__":
