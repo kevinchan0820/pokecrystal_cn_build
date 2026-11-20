@@ -1,0 +1,14 @@
+name: Traditional Chinese build checks
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - work/zh-hant-tw
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - run: python3 --version
