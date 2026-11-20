@@ -21,8 +21,9 @@ def smoke(rom: Path, output: Path) -> dict:
     emulator = PyBoy(str(rom), window="null", sound_emulated=False)
     emulator.set_emulation_speed(0)
     samples = {}
+    interactions = {}
     try:
-        for target in (180, 600, 1200):
+        for target in (180, 600, 1200, 2400, 3600):
             ticks = target - (max(samples) if samples else 0)
             emulator.tick(ticks, render=True)
             picture = emulator.screen.image.copy()
@@ -32,15 +33,35 @@ def smoke(rom: Path, output: Path) -> dict:
             png = output / ("zh_tw_boot_%04d.png" % target)
             picture.save(png)
             samples[target] = {"png": str(png), "unique_colors": colors}
+
+        # Move beyond the intro: try title -> menu -> new-game dialogue.
+        # Screens are captured for human review; input timing is not taken
+        # as proof that the full game or every translation is correct.
+        for button, label, ticks in [
+            ("start", "menu", 180),
+            ("a", "new_game", 240),
+            ("a", "dialogue_1", 180),
+            ("a", "dialogue_2", 180),
+        ]:
+            emulator.button(button)
+            emulator.tick(ticks, render=True)
+            image = emulator.screen.image.copy()
+            screenshot = output / ("zh_tw_%s.png" % label)
+            image.save(screenshot)
+            interactions[label] = {
+                "png": str(screenshot),
+                "unique_colors": len(image.convert("RGB").getcolors(maxcolors=256**3) or []),
+            }
     finally:
         emulator.stop(save=False)
     summary = {
         "rom_title": title,
         "rom_bytes": len(data),
         "cgb_flag": data[0x143],
-        "frames_emulated": 1200,
+        "frames_emulated": 4380,
         "rendered_screenshots": samples,
-        "screen_nonblank": any(v["unique_colors"] > 1 for v in samples.values()),
+        "interaction_screenshots": interactions,
+        "screen_nonblank": any(v["unique_colors"] > 1 for v in list(samples.values()) + list(interactions.values())),
         "qualification": "Automated boot/render smoke check only, not complete game QA",
     }
     if not summary["screen_nonblank"]:
