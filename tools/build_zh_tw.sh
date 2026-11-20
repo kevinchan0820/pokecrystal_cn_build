@@ -43,6 +43,7 @@ python3 tools/zh_tw_prepare.py \
   --charmap pokecrystal_cn/constants/charmap_cn.asm \
   --species data/pokemon_zh_hant_251.json \
   --report zh_tw_postfont_report.json \
+  --audit-only \
   --strict
 
 # The importer does not automatically know which sheet is the translated draft.
