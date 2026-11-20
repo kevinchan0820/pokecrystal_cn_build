@@ -14,8 +14,8 @@ TEXT_DIRECTIVES = ("db_w", "li", "text", "line", "cont", "next", "para", "db")
 #   .PokedexString: db_w "图鉴@"
 # The old first-token-only check saw ".PokedexString:" and silently missed it.
 DISPLAY_LINE = re.compile(
-    r"^\\s*(?:(?:[A-Za-z_.][A-Za-z0-9_.$@]*)(?:::|:)\\s*)?"
-    r"(?:" + "|".join(TEXT_DIRECTIVES) + r")(?=\\s|$)"
+    r"^\s*(?:(?:[A-Za-z_.][A-Za-z0-9_.$@]*)(?:::|:)\s*)?"
+    r"(?:" + "|".join(TEXT_DIRECTIVES) + r")(?=\s|$)"
 )
 
 
@@ -28,7 +28,7 @@ def separate_comment(line):
             quoted = not quoted
         if char == ";" and not quoted:
             return line[:i], line[i:]
-        if char == "\\\\" and not escaped:
+        if char == "\\" and not escaped:
             escaped = True
         else:
             escaped = False
