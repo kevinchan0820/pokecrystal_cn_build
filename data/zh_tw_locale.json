@@ -109,7 +109,8 @@
       "from": "零花錢",
       "to": "零用錢",
       "evidence": "Taiwan conventional usage and equivalent semantics",
-      "source_url": "https://en.wiktionary.org/wiki/零用錢"
+      "source_url": "https://en.wiktionary.org/wiki/零用錢",
+      "expected_count": 3
     },
     {
       "id": "battle-not-very-effective",
@@ -117,7 +118,99 @@
       "from": "好像效果不好<……>",
       "to": "效果不太好<……>",
       "reason": "Niantic's Traditional Chinese Pokémon GO help explicitly calls the ineffective-hit message「效果不太好」; preserve the existing imported control token <……>.",
-      "source_url": "https://niantic.helpshift.com/hc/zh-hant/6-pokemon-go/faq/2132-type-effectiveness-in-battle/"
+      "source_url": "https://niantic.helpshift.com/hc/zh-hant/6-pokemon-go/faq/2132-type-effectiveness-in-battle/",
+      "expected_count": 1,
+      "sheet": "文3",
+      "cell": "E2842"
+    },
+    {
+      "id": "rocket-prc-slang",
+      "sheet": "文1",
+      "cell": "E5304",
+      "from": "火箭隊啥都幹！",
+      "to": "火箭隊什麼都做！",
+      "source_gloss": "Everything we do is for profit.",
+      "scope": "dialogue",
+      "expected_count": 1,
+      "reason": "Verified directly against English/Japanese source rows; preserve dialogue meaning and short GBC lines."
+    },
+    {
+      "id": "impressive-natural",
+      "sheet": "文2",
+      "cell": "E3080",
+      "from": "有點那啥……",
+      "to": "還真不簡單……",
+      "source_gloss": "wow, impressively",
+      "scope": "dialogue",
+      "expected_count": 1,
+      "reason": "Verified directly against English/Japanese source rows; preserve dialogue meaning and short GBC lines."
+    },
+    {
+      "id": "no-more-pokemon",
+      "sheet": "文3",
+      "cell": "E313",
+      "from": "甭想帶走更多，",
+      "to": "別想帶走更多，",
+      "source_gloss": "You can't take any more #MON.",
+      "scope": "dialogue",
+      "expected_count": 1,
+      "reason": "Verified directly against English/Japanese source rows; preserve dialogue meaning and short GBC lines."
+    },
+    {
+      "id": "favorite-rapidash",
+      "sheet": "文5",
+      "cell": "E5239",
+      "from": "那啥……那就先介紹",
+      "to": "那麼……先來介紹",
+      "source_gloss": "So... my favorite RAPIDASH...",
+      "scope": "dialogue",
+      "expected_count": 1,
+      "reason": "Verified directly against English/Japanese source rows; preserve dialogue meaning and short GBC lines."
+    },
+    {
+      "id": "grandpa-surprised",
+      "sheet": "文5",
+      "cell": "E5285",
+      "from": "……啥？不是？",
+      "to": "……咦？不是？",
+      "source_gloss": "No? Oh...",
+      "scope": "dialogue",
+      "expected_count": 1,
+      "reason": "Verified directly against English/Japanese source rows; preserve dialogue meaning and short GBC lines."
+    },
+    {
+      "id": "blank-page",
+      "sheet": "文6",
+      "cell": "E4389",
+      "from": "接下來就啥也沒寫了……",
+      "to": "下一頁什麼都沒寫……",
+      "source_gloss": "The next page is... Blank!",
+      "scope": "dialogue",
+      "expected_count": 1,
+      "reason": "Verified directly against English/Japanese source rows; preserve dialogue meaning and short GBC lines."
+    },
+    {
+      "id": "move-deleter-house",
+      "sheet": "文7",
+      "cell": "E5194",
+      "from": "啥都能忘記？爺爺的家",
+      "to": "遺忘爺爺的家",
+      "source_gloss": "MOVE DELETER'S HOUSE",
+      "source_url": "https://wiki.52poke.com/zh-hant/遺忘爺爺",
+      "scope": "dialogue",
+      "expected_count": 1,
+      "reason": "Verified directly against English/Japanese source rows; preserve dialogue meaning and short GBC lines."
+    },
+    {
+      "id": "tully-phone-surprised",
+      "sheet": "文8",
+      "cell": "E5586",
+      "from": "喂，我是禾念。啥？",
+      "to": "喂，我是禾念。咦？",
+      "source_gloss": "Yup, TULLY here... <PLAY_G>? What?",
+      "scope": "dialogue",
+      "expected_count": 1,
+      "reason": "Verified directly against English/Japanese source rows; preserve dialogue meaning and short GBC lines."
     }
   ]
 }
