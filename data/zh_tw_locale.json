@@ -26,6 +26,22 @@
       "to": "列印濃度",
       "reason": "Taiwan Traditional Chinese calls printing 列印.",
       "source_url": "https://support.nintendo.com/hk/switch2/mastery/accessibility/index.html"
+    },
+    {
+      "id": "stats-ot-short-label",
+      "path": "engine/pokemon/stats_screen.asm",
+      "from": "初訓家/@",
+      "to": "訓練家/@",
+      "reason": "OT = Original Trainer; current stats layout starts owner name at x14, 6 tiles after x8 label. 原訓練家 needs 8 tiles and would overlap name; 訓練家 is 6 tiles and remains recognizable in context.",
+      "source_url": "https://wiki.52poke.com/zh-hant/初訓家"
+    },
+    {
+      "id": "trainer-card-pocket-money",
+      "path": "engine/menus/trainer_card.asm",
+      "from": "零花錢@",
+      "to": "零用錢@",
+      "reason": "Taiwan/Hong Kong common writing uses 零用錢 for pocket money; preserve exactly three Chinese glyphs.",
+      "source_url": "https://en.wiktionary.org/wiki/零用錢"
     }
   ],
   "editorial_review": [
@@ -34,9 +50,9 @@
       "english": "Original Trainer (OT)",
       "official_or_existing": "初訓家",
       "proposed_plain_language": "原訓練家",
-      "status": "needs layout and usage review",
+      "status": "short stats-screen label set to 訓練家 (pending gameplay screenshot)",
       "source_url": "https://wiki.52poke.com/zh-hant/初訓家",
-      "note": "Existing Pokémon terminology, not a mainland-only mistranslation. Do not globally replace without display-width and save compatibility review."
+      "note": "Original trainer has a 3 Han-glyph label width in stats screen; longer 原訓練家 would overlap OT name. Keep explicit Original Trainer meaning in documentation."
     },
     {
       "term": "拼音排序模式",
