@@ -116,7 +116,10 @@ def build(root, workbook, fontname, report, pointsize):
         additions[target] = (hi, lo, old)
         allocated.add((hi, lo))
 
-    chosen_font = ImageFont.truetype(fontname, size=pointsize)
+    # NotoSansCJK-Regular.ttc contains JP, KR, SC, TC and HK faces.
+    # The Taiwan font is face #3, NOT the default Japanese face #0.
+    font_index = 3 if Path(fontname).name == "NotoSansCJK-Regular.ttc" else 0
+    chosen_font = ImageFont.truetype(fontname, size=pointsize, index=font_index)
     changed = set()
     for character, (hi, lo, old) in additions.items():
         changed.add(write_glyph(root, hi, lo, render(character, chosen_font)))
