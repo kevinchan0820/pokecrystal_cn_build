@@ -58,12 +58,25 @@ def main():
     parser.add_argument("--output", type=Path, default=Path("Pokemon_Crystal_zh_TW.gbc"))
     parser.add_argument("--manifest", type=Path, default=None)
     args = parser.parse_args()
+    if not args.original_rom.is_file():
+        parser.error(
+            "Original ROM not found: " + str(args.original_rom) + ". "
+            "The example name 原版水晶.gbc is only a placeholder; no game ROM "
+            "is included. Pass your real Crystal US v1.1 backup's file path. "
+            "To search your Mac: find ~/Downloads -maxdepth 3 -type f -iname '*.gbc'"
+        )
+    if not args.patch.is_file():
+        parser.error("IPS patch not found: " + str(args.patch) +
+                     ". Keep the patch in this folder, or pass its full path.")
     base = args.original_rom.read_bytes()
     if hashlib.sha1(base).hexdigest() != BASE_SHA1:
         parser.error("Wrong base ROM: expected Pokémon Crystal US v1.1 (SHA1: " + BASE_SHA1 + ")")
     patch = args.patch.read_bytes()
     manifest_file = args.manifest or args.patch.with_name("zh_tw_patch_manifest.json")
-    manifest = json.loads(manifest_file.read_text(encoding="utf-8")) if manifest_file.exists() else None
+    if not manifest_file.is_file():
+        parser.error("Patch manifest not found: " + str(manifest_file) +
+                     ". Keep zh_tw_patch_manifest.json next to the IPS patch.")
+    manifest = json.loads(manifest_file.read_text(encoding="utf-8"))
     if manifest and hashlib.sha256(patch).hexdigest() != manifest["patch_sha256"]:
         parser.error("Patch checksum mismatch. Download again.")
     result = apply_ips(base, patch)
