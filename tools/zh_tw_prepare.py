@@ -27,7 +27,7 @@ def translation_cells(workbook):
                 yield sheet, row, 4
         elif sheet.title == "图":
             for row in range(1, sheet.max_row + 1):
-                if (row - 1) % 9 in (5, 6, 7):
+                if (row - 1) % 9 in (1, 5, 6, 7):
                     yield sheet, row, 5
         elif re.fullmatch(r"文[1-9]", sheet.title):
             for row in range(1, sheet.max_row + 1):
