@@ -19,6 +19,9 @@ def import_pokemon():
         if 'db_w "' in line:
             name = ws.cell(row = wbi, column = 4).value
             wbi += 1
+            if not isinstance(name, str) or not name:
+                file_opt.append(line)
+                continue
             # The ROM name table is ten *encoded* bytes wide. DFS stores
             # Chinese glyphs as two bytes, including glyphs outside GB2312.
             name_len = sum(2 if ord(ch) > 127 else 1 for ch in name)
@@ -44,6 +47,9 @@ def import_trainer():
         if 'db_w "' in line and line[0] != ';':
             name = ws.cell(row = wbi, column = 4).value
             wbi += 1
+            if not isinstance(name, str) or not name:
+                file_opt.append(line)
+                continue
             line_sp = line.split('"')
             line_sp[1] = name + '@'
             line = '"'.join(line_sp)
@@ -63,6 +69,9 @@ def import_class():
         if 'li "' in line:
             name = ws.cell(row = wbi, column = 4).value
             wbi += 1
+            if not isinstance(name, str) or not name:
+                file_opt.append(line)
+                continue
             line_sp = line.split('"')
             line_sp[1] = name
             line = '"'.join(line_sp)
@@ -82,6 +91,9 @@ def import_map():
         if 'db_w "' in line:
             name = ws.cell(row = wbi, column = 4).value
             wbi += 1
+            if not isinstance(name, str) or not name:
+                file_opt.append(line)
+                continue
             line_sp = line.split('"')
             line_sp[1] = name + '@'
             line = '"'.join(line_sp)
@@ -103,6 +115,9 @@ def import_item():
         elif 'li "' in line:
             name = ws.cell(row = wbi, column = 4).value
             wbi += 1
+            if not isinstance(name, str) or not name:
+                file_opt.append(line)
+                continue
             line_sp = line.split('"')
             line_sp[1] = name
             line = '"'.join(line_sp)
@@ -122,6 +137,9 @@ def import_move():
         if 'li "' in line:
             name = ws.cell(row = wbi, column = 4).value
             wbi += 1
+            if not isinstance(name, str) or not name:
+                file_opt.append(line)
+                continue
             line_sp = line.split('"')
             line_sp[1] = name
             line = '"'.join(line_sp)
