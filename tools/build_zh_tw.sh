@@ -41,6 +41,7 @@ python3 tools/zh_tw_font.py \
 # The importer does not automatically know which sheet is the translated draft.
 export PMC_TEXT_XLSX="./text.zh-TW.xlsx"
 # shellcheck disable=SC1091
+export PATH_EXPORTED=''
 source ./env-setup
 pmc_isys
 pmc_init
