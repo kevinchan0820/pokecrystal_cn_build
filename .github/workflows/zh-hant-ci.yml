@@ -31,6 +31,8 @@ jobs:
           .venv/bin/python -m pip install openpyxl opencc-python-reimplemented Pillow pyboy
       - name: Syntax check all Python helpers
         run: .venv/bin/python -m compileall -q tools
+      - name: Verify menu localization parser regressions
+        run: .venv/bin/python -m unittest discover -s tools -p 'test_zh_tw_*.py' -v
       - name: Create translated workbook and compile ROM
         shell: bash
         run: |
