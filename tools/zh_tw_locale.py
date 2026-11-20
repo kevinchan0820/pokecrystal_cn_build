@@ -66,8 +66,44 @@ def iter_workbook_strings(workbook):
         book.close()
 
 
+def apply_dialogue_phrases(workbook: Path, rules):
+    """Only edit E-column main dialogue in the generated candidate workbook."""
+    if not rules:
+        return []
+    book = load_workbook(workbook)
+    changes = []
+    try:
+        for rule in rules:
+            if rule.get("scope") != "dialogue":
+                raise ValueError("Unsupported workbook locale scope: " + str(rule.get("scope")))
+            count = 0
+            examples = []
+            for sheet in book:
+                if not re.fullmatch(r"文[1-9]", sheet.title):
+                    continue
+                for row in range(1, sheet.max_row + 1):
+                    cell = sheet.cell(row=row, column=5)
+                    if not isinstance(cell.value, str) or rule["from"] not in cell.value:
+                        continue
+                    count += cell.value.count(rule["from"])
+                    cell.value = cell.value.replace(rule["from"], rule["to"])
+                    if len(examples) < 20:
+                        examples.append(f"{sheet.title}!{cell.coordinate}")
+            changes.append({
+                "id": rule["id"], "from": rule["from"], "to": rule["to"],
+                "count": count, "sample_cells": examples,
+            })
+        if any(change["count"] for change in changes):
+            book.save(workbook)
+    finally:
+        book.close()
+    return changes
+
+
 def apply(root: Path, workbook: Path, rules_file: Path, report: Path):
     settings = json.loads(rules_file.read_text(encoding="utf-8"))
+    dialogue_changes = apply_dialogue_phrases(
+        workbook, settings.get("workbook_phrase_rules", []))
     results = []
     for rule in settings["ui_rules"]:
         target = root / rule["path"]
@@ -124,6 +160,7 @@ def apply(root: Path, workbook: Path, rules_file: Path, report: Path):
                                         "text": line.strip()[:150]})
     payload = {
         "locale": settings["locale"],
+        "applied_dialogue_rules": dialogue_changes,
         "applied_ui_rules": results,
         "review_flags": dict(flagged),
         "review_examples": samples,
