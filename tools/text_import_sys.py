@@ -19,7 +19,11 @@ def import_pokemon():
         if 'db_w "' in line:
             name = ws.cell(row = wbi, column = 4).value
             wbi += 1
-            name_len = len(name.encode(encoding = 'gb2312'))
+            # The ROM name table is ten *encoded* bytes wide. DFS stores
+            # Chinese glyphs as two bytes, including glyphs outside GB2312.
+            name_len = sum(2 if ord(ch) > 127 else 1 for ch in name)
+            if name_len > 10:
+                raise ValueError("Pokémon name exceeds 10 bytes: " + name)
             name_pad = name + '@' * (10 - name_len)
             line_sp = line.split('"')
             line_sp[1] = name_pad
