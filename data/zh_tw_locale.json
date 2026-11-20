@@ -81,5 +81,15 @@
     "從頭開始",
     "記錄",
     "拼音排序"
+  ],
+  "workbook_phrase_rules": [
+    {
+      "id": "dialogue-pocket-money",
+      "scope": "dialogue",
+      "from": "零花錢",
+      "to": "零用錢",
+      "evidence": "Taiwan conventional usage and equivalent semantics",
+      "source_url": "https://en.wiktionary.org/wiki/零用錢"
+    }
   ]
 }
