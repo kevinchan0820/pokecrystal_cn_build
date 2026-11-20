@@ -50,6 +50,12 @@ python3 tools/zh_tw_font.py \
   --extra-text cn_credits.diff \
   --font "$FONT_FILE" \
   --report zh_tw_font_report.json
+# Check whether common Taiwan/Hong Kong names can be entered via the current
+# Mandarin-Pinyin candidate tables; this is NOT a Taiwan Zhuyin/HK Cangjie IME.
+python3 tools/zh_tw_naming_audit.py \
+  --source pokecrystal_cn \
+  --report zh_tw_naming_audit_report.json \
+  --strict
 # Validate the final workbook against the REMAPPED charmap before building.
 python3 tools/zh_tw_prepare.py \
   --input text.zh-TW.xlsx \
