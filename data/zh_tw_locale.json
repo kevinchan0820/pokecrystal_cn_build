@@ -42,6 +42,22 @@
       "to": "零用錢@",
       "reason": "Taiwan/Hong Kong common writing uses 零用錢 for pocket money; preserve exactly three Chinese glyphs.",
       "source_url": "https://en.wiktionary.org/wiki/零用錢"
+    },
+    {
+      "id": "trade-original-trainer-label",
+      "path": "engine/movie/trade_animation.asm",
+      "from": "初訓家/",
+      "to": "訓練家/",
+      "reason": "Trade detail window shows Original Trainer and has a fixed 3-Han-glyph label; keep the label readable and within the original layout.",
+      "source_url": "https://wiki.52poke.com/zh-hant/初訓家"
+    },
+    {
+      "id": "trade-egg-original-trainer-label",
+      "path": "engine/movie/trade_animation.asm",
+      "from": "初訓家/?????",
+      "to": "訓練家/?????",
+      "reason": "Trade egg detail also uses Original Trainer label; same display-width constraint.",
+      "source_url": "https://wiki.52poke.com/zh-hant/初訓家"
     }
   ],
   "editorial_review": [
