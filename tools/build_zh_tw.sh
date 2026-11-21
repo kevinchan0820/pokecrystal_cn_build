@@ -37,6 +37,12 @@ python3 tools/zh_tw_toolbar_bitmap_audit.py \
   --source pokecrystal_cn \
   --font "$FONT_FILE" \
   --report zh_tw_toolbar_bitmap_audit_report.json
+# Bag pocket labels also contain pre-rasterized Simplified text (精灵球).
+# Decode the real tilemap and enforce official Taiwan "精靈球" bitmap.
+python3 tools/zh_tw_pack_pocket_qa.py \
+  --source pokecrystal_cn \
+  --font "$FONT_FILE" \
+  --report zh_tw_pack_pocket_audit_report.json
 python3 tools/zh_tw_prepare.py \
   --input text.xlsx \
   --output text.zh-TW.xlsx \
