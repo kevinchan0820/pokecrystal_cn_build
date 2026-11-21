@@ -1,3 +1,9 @@
+## 2026-11-21 12:54 UTC — RUNNING / SRAM root-cause regression submitted (NOT READY)
+
+- Inspected latest failed [Actions #44901284549](https://github.com/kevinchan0820/pokecrystal_cn_build/actions/runs/44901284549) and uploaded [artifact #14705969348](https://github.com/kevinchan0820/pokecrystal_cn_build/actions/runs/44901284549/artifacts/14705969348). RED: 337 D-pad routes, no `SavePlayerData`; artifact diagnostic `zh_tw_sram_start_menu.png` shows an **empty START menu window**, while `zh_tw_sram_game_save_yes_no.png` and `zh_tw_sram_save_prompt_before_search.png` show the **Trainer Card**, not the SAVE yes/no prompt. Thus the previous test's `SaveMenu` hook was insufficient to prove correct menu selection. This is a verified test-harness navigation defect; game SRAM root cause remains unproven.
+- Code commit [`51542cf5`](https://github.com/kevinchan0820/pokecrystal_cn_build/commit/51542cf5a29d9fe5860e4397e6c8ac4e413e332d) updates `tools/zh_tw_sram_player_pyboy.py`: allow START menu to render, require `wMenuSelection == STARTMENUITEM_SAVE (4)` before selecting/replaying SAVE, and wait for prompt rendering before searching YES/NO. No game ASM modified. Previous RED is real; GREEN **pending fresh exact-code-head CI**.
+- Next: inspect CI for code SHA `51542cf5` and artifact `zh_tw_sram_player_report.json` + PNGs; if RED, repair actual selection/confirmation or SRAM persistence and rerun. Then Pokémon nickname SRAM, Bag/Trainer Card/battle capture, glyph audit, final IPS. Do not claim release ready.
+
 ## 2026-11-21 12:51 UTC — STARTED / latest CI failure recovery (NOT READY)
 
 - Execution: STARTED (scheduled run; external run ID unavailable). Source HEAD `d2a1e79abd9c4a0edf59635d4a3b398eebdb3766`; build HEAD before checkpoint `bb318fbb1a2f20e2e0376912373797ba7542ab89`.
