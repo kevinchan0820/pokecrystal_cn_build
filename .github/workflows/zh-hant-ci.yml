@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - feature/zh-hant-tw-hk-1x
+    # Documentation checkpoints should not cancel active ROM builds.
+    paths-ignore:
+      - '**/*.md'
 
 concurrency:
   group: zh-hant-1x-build-work
