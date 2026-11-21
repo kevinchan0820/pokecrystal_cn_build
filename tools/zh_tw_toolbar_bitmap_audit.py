@@ -12,7 +12,7 @@ from PIL import Image, ImageDraw, ImageFont, ImageChops
 
 ASSETS = {
     "gfx/naming_screen/selection_chinese.png": "中文符號刪除完成",
-    "gfx/naming_screen/mode_labels_zh_hant.png": "拼音英文臺灣香港速成倉頡",
+    "gfx/naming_screen/mode_labels_zh_hant.png": "拼音英文臺灣香港速成倉頡注音",
 }
 
 def raster(text, font):
