@@ -112,21 +112,18 @@ def run(rom, source, folder):
             raise AssertionError("Quick mode wasn't selected")
 
         result["initial_image"] = snapshot("quick_initial")
-        # Verify the five letter QUICK header against the very same
-        # native 8x8 alphabet tiles used by the keyboard. In the old build
-        # the half-rendered Chinese header looked like corrupted text.
+        # Mode 4/Quick must show the rasterized Traditional label "速成".
+        # 5 modes x 3 tiles start at $6e, so Quick starts at $7a.
+        # Check actual tilemap rather than assuming the text engine can
+        # render 12x12 double-byte characters on this 8px header row.
         bank, start = addr["wTilemap"]
         tile = lambda row, col: gb.memory[bank, start + row*20 + col]
-        # In this project the ASCII charmap is contiguous from A=$80.
-        # Never sample Q/U from hardcoded keyboard grid coordinates: the
-        # English keyboard is laid out in GBC tile columns, not the text
-        # characters' sequential index, and our prior test falsely failed.
-        expected_label_tiles = [0x90, 0x94, 0x88, 0x82, 0x8A]  # Q U I C K
-        actual_label_tiles = [tile(6, col) for col in range(1, 6)]
+        expected_label_tiles = [0x7a, 0x7b, 0x7c]
+        actual_label_tiles = [tile(6, col) for col in range(1, 4)]
         result["quick_label_tiles"] = {
             "actual": actual_label_tiles, "expected": expected_label_tiles}
         if actual_label_tiles != expected_label_tiles:
-            raise AssertionError("Mode status is not readable native QUICK label")
+            raise AssertionError("Mode status must show Taiwanese raster title 速成")
         # The following tile row must remain blank, not a damaged lower
         # half or text spilling into the keyboard.
         empty_tile = tile(7, 12)
