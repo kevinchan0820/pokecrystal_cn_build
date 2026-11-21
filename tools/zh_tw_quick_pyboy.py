@@ -16,6 +16,7 @@ from pathlib import Path
 from pyboy import PyBoy
 
 ROUTES = (
+    (), # Quick now auto-focuses the first candidate after valid two-code lookup
     ("down", "down"), ("down", "down", "right"),
     ("right", "down", "down"), ("left", "down", "down"),
     ("down", "down", "left"), ("down", "down", "right", "right"),
