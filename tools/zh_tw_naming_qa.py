@@ -138,11 +138,11 @@ def test(rom, output, strict):
             if len(set(mode_hashes)) != 4:
                 err("visual", "Two or more mode screens are pixel-identical")
             restore(base)
-            for _ in range(5):
+            for _ in range(6):
                 press("select", 40)
             record["mode_wraparound"] = (memory("wNamingScreenLetterCase") == 0)
             if not record["mode_wraparound"]:
-                err("wraparound", "Five SELECT presses did not cycle back to Pinyin")
+                err("wraparound", "Six SELECT presses did not cycle back to Pinyin")
     except Exception as ex:
         err("runner", f"{type(ex).__name__}: {ex}")
     finally:
