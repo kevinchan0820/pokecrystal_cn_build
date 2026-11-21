@@ -1,3 +1,11 @@
+## 2026-11-21 19:54 HKT — RUNNING / SRAM failure reproduced from full CI logs (NOT READY)
+
+- Verified [Actions #44896809867](https://github.com/kevinchan0820/pokecrystal_cn_build/actions/runs/44896809867), build code `434320739`, source `d2a1e79a`: step 17 failed with `In-game SAVE yes/no was never confirmed; explored 337 actual D-pad routes`. Earlier Quick/Cangjie/Zhuyin real PyBoy steps PASSED. Artifact [14704766452](https://github.com/kevinchan0820/pokecrystal_cn_build/actions/runs/44896809867/artifacts/14704766452) uploaded despite failure. This is verified RED, **not** a proven game engine bug.
+- New diagnostic test commits `d4d8838`, `7cac3bc`, `aed75ef` in `tools/zh_tw_sram_player_pyboy.py`: register `SaveTheGame_yesorno` hook before menu navigation, capture `wMenuCursorY`, entry/rejection hook counts, and native PyBoy screenshots `zh_tw_sram_save_prompt_before_search.png` and `zh_tw_sram_save_prompt_after_search.png`. This distinguishes menu display/navigation failure from real SRAM failure; no gameplay code changed.
+- Exact current build code HEAD `aed75efff817ab409e549e1b0ced147c35dff4e7`; source HEAD `d2a1e79abd9c4a0edf59635d4a3b398eebdb3766`. The initial new run for `d4d8838` was cancelled by concurrency on subsequent commits. **Current exact-head CI is UNVERIFIED**, do not infer GREEN.
+- Immediate next action: inspect Actions for `aed75ef`, full step-17 logs and artifact `zh_tw_sram_player_report.json` / diagnostic PNGs; then fix root cause of missing SavePlayerData hook, rerun exact-head CI. Keep release NOT READY and proceed to Pokémon nickname SRAM + actual Bag/Trainer Card/battle captures.
+- Execution: CHECKPOINTED_INCOMPLETE; pending CI diagnostics, not release completion.
+
 ## 2026-11-21 19:54 HKT — STARTED / live recovery checkpoint (NOT READY)
 
 - Execution: STARTED; identity: scheduled autonomous run (no unique external ID exposed). Live source HEAD `d2a1e79abd9c4a0edf59635d4a3b398eebdb3766`; live build HEAD before this checkpoint `d66600db37fb5ed623c04dee087b526d1f43a000`.
