@@ -185,6 +185,25 @@ def run(rom:Path,source:Path,output:Path):
                 raise AssertionError(
                     "Zhuyin "+spelling+" code has candidates but cannot commit "+
                     expected+"; visited cursor positions="+str(sorted(visited)))
+        # Safety gate: a tone mark alone is not a valid phonetic
+        # syllable. Actual GBC controller A must return no candidates,
+        # and B must remove only the bad preedit, never the player name.
+        restore(initial)
+        invalid_route,invalid_state=letter(state(),"ˊ",0)
+        restore(invalid_state)
+        if val("wIMEMaxLine")!=0:
+            raise AssertionError("Tone-only Zhuyin code rendered phantom candidates")
+        if val("wNamingScreenCurNameLength")!=0:
+            raise AssertionError("Tone-only Zhuyin code corrupted player name")
+        invalid_screen=snap("invalid_tone_only")
+        key("b",30)
+        if val("wIMEPinyin")!=0x50:
+            raise AssertionError("B failed to remove tone-only invalid Zhuyin code")
+        if val("wNamingScreenCurNameLength")!=0:
+            raise AssertionError("B over invalid tone changed player name")
+        cases["invalid_tone_backspace"]={
+            "route":invalid_route,"screen":invalid_screen,
+            "zero_candidates":True,"cleared_by_b":True}
         restore(initial)
         key("select",35)
         if val("wNamingScreenLetterCase")!=0:
@@ -194,7 +213,7 @@ def run(rom:Path,source:Path,output:Path):
         failures.append(type(exc).__name__+": "+str(exc))
     finally:
         gb.stop(save=False)
-        result={"passed":not failures and len(cases)==6,
+        result={"passed":not failures and len(cases)==7,
                 "cases":cases,"failures":failures,
                 "test":"real Taiwan Zhuyin 41-symbol two-page keypress, tones, selection/name"}
         (output/"zh_tw_zhuyin_runtime_report.json").write_text(
