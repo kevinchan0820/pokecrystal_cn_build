@@ -11,6 +11,7 @@ Implement real Hong Kong **速成 / Quick** and Taiwan **注音 / Bopomofo** in 
 - Four earlier modes were: Mandarin Pinyin, English, Taiwan fixed-character grid, Hong Kong fixed-character grid. PyBoy grid-entry worked but is **not** a proper Quick or Zhuyin IME.
 - True Quick **prototype code has now been written** in source repo `kevinchan0820/pokecrystal_cn`, branch `feature/zh-hant-tw-hk-1x`:
   - `engine/dfs/ime.asm`: mode 4 dispatch, two-code composer and Quick lookup.
+  - Fixed include order: Quick key/index table must be compiled *before* the TW/HK common table's separate ROMX SECTION, so CPU lookup reads the correct bank.
   - `data/ime/ime_quick_twhk.asm`: initial test code table: A→日, AA→晶, AB→明, AD→杲. **Only four codes, not a complete dictionary.**
   - `engine/menus/naming_screen.asm`: fifth SELECT mode `速成(兩碼)`.
 - Build repo `kevinchan0820/pokecrystal_cn_build` on same branch:
