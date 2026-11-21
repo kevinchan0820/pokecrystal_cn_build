@@ -1,3 +1,9 @@
+## 2026-11-21 12:51 UTC — STARTED / latest CI failure recovery (NOT READY)
+
+- Execution: STARTED (scheduled run; external run ID unavailable). Source HEAD `d2a1e79abd9c4a0edf59635d4a3b398eebdb3766`; build HEAD before checkpoint `bb318fbb1a2f20e2e0376912373797ba7542ab89`.
+- Newest exact-code-head Actions [#44901284549](https://github.com/kevinchan0820/pokecrystal_cn_build/actions/runs/44901284549) for `aed75efff817ab409e549e1b0ced147c35dff4e7` is **FAILURE** (not RUNNING); earlier `7cac3bc` and `d4d8838` were cancelled. Markdown-only checkpoint commits are ignored by workflow trigger.
+- First release blocker: genuine SAVE / battery SRAM / fresh CONTINUE in `tools/zh_tw_sram_player_pyboy.py`. Next: inspect #44901284549 job logs and artifact diagnostic report/PNG; fix root cause, rerun exact-code-head CI. Additional unmet: Pokémon nickname persistence, Bag/Trainer Card/battle screenshots, glyph audit, final IPS. No release.
+
 ## 2026-11-21 19:54 HKT — RUNNING / SRAM failure reproduced from full CI logs (NOT READY)
 
 - Verified [Actions #44896809867](https://github.com/kevinchan0820/pokecrystal_cn_build/actions/runs/44896809867), build code `434320739`, source `d2a1e79a`: step 17 failed with `In-game SAVE yes/no was never confirmed; explored 337 actual D-pad routes`. Earlier Quick/Cangjie/Zhuyin real PyBoy steps PASSED. Artifact [14704766452](https://github.com/kevinchan0820/pokecrystal_cn_build/actions/runs/44896809867/artifacts/14704766452) uploaded despite failure. This is verified RED, **not** a proven game engine bug.
