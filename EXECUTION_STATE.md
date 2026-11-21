@@ -1,3 +1,8 @@
+## 2026-11-21 12:55 UTC — CHECKPOINTED_INCOMPLETE / fresh CI active
+
+- Code `51542cf5a29d9fe5860e4397e6c8ac4e413e332d` is now under fresh exact-build-code [Actions #44906021918](https://github.com/kevinchan0820/pokecrystal_cn_build/actions/runs/44906021918) **IN_PROGRESS** (first job started); source still `d2a1e79abd9c4a0edf59635d4a3b398eebdb3766`. Build branch HEAD before this checkpoint: `9ca8244d0d9b5e205c1dd804b9754fd33b4ee64a`. Markdown-only checkpoints do not trigger workflow.
+- No GREEN evidence yet. The previous artifact conclusively showed Trainer Card where SAVE yes/no should be. Next run must inspect exact-run logs, `zh_tw_sram_player_report.json` and native screenshots; if corrected menu selection still fails, trace `wMenuSelection` and controller timing, then SRAM save/reload. Keep NOT READY.
+
 ## 2026-11-21 12:54 UTC — RUNNING / SRAM root-cause regression submitted (NOT READY)
 
 - Inspected latest failed [Actions #44901284549](https://github.com/kevinchan0820/pokecrystal_cn_build/actions/runs/44901284549) and uploaded [artifact #14705969348](https://github.com/kevinchan0820/pokecrystal_cn_build/actions/runs/44901284549/artifacts/14705969348). RED: 337 D-pad routes, no `SavePlayerData`; artifact diagnostic `zh_tw_sram_start_menu.png` shows an **empty START menu window**, while `zh_tw_sram_game_save_yes_no.png` and `zh_tw_sram_save_prompt_before_search.png` show the **Trainer Card**, not the SAVE yes/no prompt. Thus the previous test's `SaveMenu` hook was insufficient to prove correct menu selection. This is a verified test-harness navigation defect; game SRAM root cause remains unproven.
