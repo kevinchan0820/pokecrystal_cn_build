@@ -1,3 +1,9 @@
+## 2026-11-21 19:00 HKT — SRAM SAVE controller route investigation (NOT READY)
+
+- Live source HEAD `d2a1e79abd9c4a0edf59635d4a3b398eebdb3766`; build HEAD at investigation start `eff0a4b38e307d77db3eec05e45f4b810b1ae426`. Exact-head Actions [#44893881014](https://github.com/kevinchan0820/pokecrystal_cn_build/actions/runs/44893881014) **FAILURE**, step 17 `Verify real player name SAVE, battery SRAM and fresh CONTINUE`. Failure detail not retrievable from available job metadata; do not claim root cause proven. Earlier #44893530561 also failed.
+- Actual new test commit [`434320739b1004908f19a9bd9e0decf2292c927c`](https://github.com/kevinchan0820/pokecrystal_cn_build/commit/434320739b1004908f19a9bd9e0decf2292c927c): `tools/zh_tw_sram_player_pyboy.py` expands real D-pad SAVE dialog route search to deterministic combinations of A/B/UP/DOWN up to 4 presses; it still requires the real `SavePlayerData` CPU hook, SRAM bytes and fresh emulator CONTINUE. No manual SRAM injection or save_state substitution. This is diagnostic coverage, **not yet GREEN**; latest Actions for this commit was not visible at ledger time.
+- Immediate next action: fetch exact-head Actions run for `434320739`, inspect failure log and `zh_tw_sram_player_report.json`/screenshots from artifact; if still red, determine whether failure is SAVE prompt, SRAM, or CONTINUE and fix root cause. Then implement real Pokémon nickname persistence, Bag/Trainer Card/burn screenshots and visual review. Keep 1.0 untouched. No final IPS release.
+
 ## 2026-11-21 17:55 HKT — Native PyBoy PNG evidence integrity gate
 
 - Live source branch HEAD: `d2a1e79abd9c4a0edf59635d4a3b398eebdb3766`. Last observed completed CI #44888907362 SUCCESS for build `6117c01bdeb044aa3448e562949a7fdac08a00f6`; artifact `14700812593`. That CI is **not** evidence for the new change.
