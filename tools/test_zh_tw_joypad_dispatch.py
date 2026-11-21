@@ -20,9 +20,9 @@ class NamingJoypadDispatchTest(unittest.TestCase):
         for button, target in (("A_BUTTON", ".a"), ("B_BUTTON", ".b"),
                                ("START", ".start"), ("SELECT", ".select")):
             with self.subTest(button=button):
-                expr = (r"and\\s+" + button + r"\\s*\\n\\s*jp\\s+nz,\\s*"
-                        + re.escape(target) + r"\\b")
-                self.assertRegex(dispatch, expr.replace(r"\\s", r"\s"))
+                expr = (r"and\s+" + button + r"\s*\n\s*jp\s+nz,\s*"
+                        + re.escape(target) + r"\b")
+                self.assertRegex(dispatch, expr)
         self.assertNotRegex(dispatch, r"(?m)^\s*jr\s+nz,\s*\.(?:a|b|start|select)\b")
 
 
