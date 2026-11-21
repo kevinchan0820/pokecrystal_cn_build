@@ -1,3 +1,10 @@
+## 2026-11-21 17:55 HKT — Native PyBoy PNG evidence integrity gate
+
+- Live source branch HEAD: `d2a1e79abd9c4a0edf59635d4a3b398eebdb3766`. Last observed completed CI #44888907362 SUCCESS for build `6117c01bdeb044aa3448e562949a7fdac08a00f6`; artifact `14700812593`. That CI is **not** evidence for the new change.
+- Actual build-branch test commit `c7495c9c2ad2474b61ad7a3450b71568cb6b98c0`: `tools/zh_tw_ci_handoff.py` now rejects absent/truncated, non-PNG or non-native-size (not 160x144) screenshots. This strengthens the existing screenshot evidence gate; a valid PNG header alone does **not** prove controller provenance or genuine pixels. Existing PyBoy tests must still independently prove behavior.
+- RED rationale: previous handoff accepted any existing filename as screen evidence. New test would reject a dummy or scaled screenshot; not yet independently observed failing and passing in CI. **Fresh exact-head CI remains UNVERIFIED** until workflow for this commit completes and its machine JSON and real images are inspected. Release remains NOT READY.
+- Next immediate action: check GitHub Actions run for build `c7495c9c`, inspect logs if red and verify `zh_tw_ci_handoff.json` if green; then implement **actual in-game SRAM player/Pokémon nickname save/reload test**, distinct from emulator save_state snapshots, plus actual Bag/Trainer Card/burn screenshots. No merge to 1.0; no Nintendo ROM distributed.
+
 # Crystal 1.x — durable execution state
 
 ## 2026-11-21 — Latest verified real IME code/PNG/IPS; not final release
