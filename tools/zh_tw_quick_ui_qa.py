@@ -214,8 +214,20 @@ def run(rom, source, folder):
                 raise AssertionError(f"Visible Quick key {chr(i+65)} is still Latin in VRAM bank1")
         # SELECT from Quick to Pinyin must restore the stock Latin alphabet.
         key("select", 35)
+        if val("wNamingScreenLetterCase") != 5:
+            raise AssertionError("Quick -> Cangjie fifth-root mode transition failed")
+        result["cangjie_mode5_label"] = snapshot("full_cangjie_label")
+        # Cangjie must preserve root glyphs; only after SECOND SELECT do
+        # we switch back to Pinyin and restore the Latin keyboard.
+        if key_pixels(0) != expanded_root(0):
+            raise AssertionError("Cangjie mode unexpectedly restored Latin key tiles")
+        bank, tstart = addr["wTilemap"]
+        label = [gb.memory[bank, tstart + 6*20 + col] for col in range(1,4)]
+        if label != [0x7d, 0x7e, 0x7f]:
+            raise AssertionError(f"Cangjie mode heading must be 倉頡, got {label}")
+        key("select", 35)
         if val("wNamingScreenLetterCase") != 0:
-            raise AssertionError("Quick -> Pinyin mode transition failed")
+            raise AssertionError("Cangjie -> Pinyin mode transition failed")
         if any(key_pixels(i) == expanded_root(i) for i in samples):
             raise AssertionError("Latin keyboard glyphs not restored after leaving Quick")
         latin_screen = gb.screen.image.copy()
