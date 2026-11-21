@@ -44,6 +44,10 @@ jobs:
         if: success()
         run: |
           .venv/bin/python tools/zh_tw_smoke.py build/pokecrystal11.gbc --output .
+      - name: Capture real Options and 1-8 frame UI
+        if: success()
+        run: |
+          .venv/bin/python tools/zh_tw_ui_capture.py build/pokecrystal11.gbc --output .
       - name: Build verified clean Crystal and generate a patch
         if: success()
         run: |
