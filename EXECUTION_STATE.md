@@ -1,5 +1,15 @@
 # Crystal 1.x — durable execution state
 
+## Verified checkpoint — 2026-11-21: Trainer Card raster Traditional, exact CI green
+
+- **Source commit:** `kevinchan0820/pokecrystal_cn@bb2087cfeb9082d0a3e0f1ad887fde9b538112b9` (only `feature/zh-hant-tw-hk-1x`). **Build code commit:** `kevinchan0820/pokecrystal_cn_build@09523558c973dca7dd0eba000d24420e3acd4421`; later docs-only audit `f4c4947524e96f9e0c34ccd746074fefe151cb8c`.
+- **Latest verified CI:** [#44872657612](https://github.com/kevinchan0820/pokecrystal_cn_build/actions/runs/44872657612) **success** — title/toolbar/pack/trainer-card raster audits, battle-text 5 canonical lines, ROM compile, boot, Options and frame screens, PyBoy naming, real root-key Quick `AA→晶 / AB→明 / VD→好`, new IPS + checksum roundtrip. The GitHub artifact includes `zh_tw_trainer_card_raster_report.json`: `verified=true`, `errors=[]`.
+- **New root cause:** User screenshots' battle status text may come from an outdated ROM, but current translation source already contains `敵人的【0】` and `受到了灼傷的傷害！`; do not infer old screenshot's ROM build SHA. Current `zh_tw_battle_audit_report.json` checked **20,735** dialogue cells and 5 canonical entries; still need a real burned-status PyBoy battle screenshot to close visual acceptance.
+- **New PNG defect:** `gfx/trainer_card/card_status.png` is a real loaded 48x8 raster via `engine/menus/trainer_card.asm` (`CardStatusGFX`); previous source used simplified `当前状态`. Now contains approved Taiwan 8px `目前狀態` at unchanged dimensions. Initial red test failed all four glyphs; local green test passed all.
+- **Testing failure and repair:** [#44872489401](https://github.com/kevinchan0820/pokecrystal_cn_build/actions/runs/44872489401) failed 3 of 4 glyph comparisons because CI's installed TTC/Pillow rasterizer differs from the asset-authoring runtime, not because the uploaded image changed. Replaced host-dependent re-rasterization with **per-glyph hashes of approved decoded 12x8 pixels**. Rerun exact-head [#44872657612](https://github.com/kevinchan0820/pokecrystal_cn_build/actions/runs/44872657612) green.
+- **Inventory**: see [RUNTIME_TRADITIONAL_IMAGE_AUDIT.md](RUNTIME_TRADITIONAL_IMAGE_AUDIT.md), including unverified `gfx/new_game/name_chinese.png`, Trainer Card live screenshot, actual bag page and burned battle.
+- **NEXT ACTION, no prompting required:** drive PyBoy into actual Trainer Card, Bag, and battle, capture screenshot and compare on-screen pixel/text against Traditional; if mismatch, add RED test, patch and rerun. Audit 40x8 `gfx/new_game/name_chinese.png` against its real assembly reference. Expand genuine Quick code coverage, full Cangjie and Taiwanese 注音 later; existing 26 root keyboard is already functioning. **Do not mark 1.x release ready** until all UI and gameplay scenarios accepted. Keep 1.0 unchanged.
+
 ## Verified checkpoint — 2026-11-21: Rime keyboard RED→GREEN and battle glyphs
 
 - **Exact source head:** `kevinchan0820/pokecrystal_cn@323e789640d5cd1b0f0bcba80162e6ec83d92c0f`. **Exact latest verified build HEAD:** `kevinchan0820/pokecrystal_cn_build@6e128cb20d103ffe42e52502d0bf87900b57a15a`.
