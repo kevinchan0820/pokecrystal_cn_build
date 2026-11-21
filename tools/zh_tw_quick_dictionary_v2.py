@@ -96,7 +96,8 @@ def emit_asm(buckets: dict[str,list[str]]):
     Each chunk is <=3KB to avoid ROMX bank overflow/fragmentation.
     """
     labels = {"": "QuickV2CandidatesEmpty"}
-    index = ["; Generated Quick v2 index: 0 empty, 1..26 one letter, 27..702 pairs.",
+    index = ["PUSHS", 'SECTION "Quick v2 Index", ROMX',
+             "; Generated Quick v2 index: 0 empty, 1..26 one letter, 27..702 pairs.",
              "; Upstream MIT table; include full license notice when distributing.",
              "QuickV2Entry:"]
     sections = []
@@ -120,6 +121,8 @@ def emit_asm(buckets: dict[str,list[str]]):
         # One two-byte terminator; rounded up only to prevent accidental
         # bank-end high byte over-read, not an entire screen line.
         size = len(chars) * 2 + 2
+        if size > ROM_CHUNK_TARGET_BYTES:
+            raise ValueError("One Quick candidate group exceeds bank-safe chunk: "+key)
         if section_bytes + size > ROM_CHUNK_TARGET_BYTES:
             section.append("POPS")
             next_chunk()
@@ -138,10 +141,11 @@ def emit_asm(buckets: dict[str,list[str]]):
             raise ValueError("Candidate row count does not fit a byte: "+key)
         name = labels[key]
         index.append(f"\tdbbw {pages}, BANK({name}), {name} ; {key or '(empty)'} {len(chars)} candidate(s)")
+    index.append("POPS")
     return "\n".join(index+[""]+[line for sect in sections for line in sect])+"\n", {
         "entry_slots":len(KEYS),
         "index_bytes":len(KEYS)*4,
-        "candidate_bytes":sum(len(v)*2+2 for v in buckets.values())+2,
+        "candidate_bytes":sum(len(buckets.get(k,[]))*2+2 for k in KEYS),
         "source_chunks":section_no+1,
         "max_candidates_per_code":max(map(len,buckets.values())),
         "max_candidate_rows":max((len(x)+7)//8 for x in buckets.values()),
