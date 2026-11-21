@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Block non-Taiwan glyphs in ALL custom naming-screen UI image labels.
 
-Assets: 96x8 action bar 中文符號刪除完成 and 120x8 input mode bar
-拼音英文臺灣香港速成. Each Han character is 12x8 source pixels
+Assets: 96x8 action bar 中文符號刪除完成 and 144x8 input mode bar
+拼音英文臺灣香港速成倉頡. Each Han character is 12x8 source pixels
 compiled as GBC 8x8 tiles; OpenCC cannot convert pre-rasterized art.
 """
 import argparse
@@ -12,7 +12,7 @@ from PIL import Image, ImageDraw, ImageFont, ImageChops
 
 ASSETS = {
     "gfx/naming_screen/selection_chinese.png": "中文符號刪除完成",
-    "gfx/naming_screen/mode_labels_zh_hant.png": "拼音英文臺灣香港速成",
+    "gfx/naming_screen/mode_labels_zh_hant.png": "拼音英文臺灣香港速成倉頡",
 }
 
 def raster(text, font):
