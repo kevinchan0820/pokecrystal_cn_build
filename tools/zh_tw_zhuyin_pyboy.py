@@ -101,6 +101,26 @@ def run(rom:Path,source:Path,output:Path):
         if black>3:
             raise AssertionError("Zhuyin seventh title overwrote blank tile: "+str(black))
         initial=state()
+        # Controller-driven visual regression: switching to the second
+        # 26-key symbol page must actually redraw keys, and switching back
+        # must restore the original pixels without stale tiles. A WRAM-only
+        # page flag is insufficient evidence of a usable Zhuyin keyboard.
+        page0_pixels=gb.screen.image.convert("RGB").crop((8,32,152,88)).tobytes()
+        key("start",30)
+        if val("wIMEFullCandidateCount")!=1:
+            raise AssertionError("START did not enter second Zhuyin key page")
+        page1_pixels=gb.screen.image.convert("RGB").crop((8,32,152,88)).tobytes()
+        if page1_pixels==page0_pixels:
+            raise AssertionError("Zhuyin page flag changed without redrawing key glyphs")
+        page1_png=snap("second_symbol_page")
+        key("start",30)
+        if val("wIMEFullCandidateCount")!=0:
+            raise AssertionError("START did not return to first Zhuyin key page")
+        if gb.screen.image.convert("RGB").crop((8,32,152,88)).tobytes()!=page0_pixels:
+            raise AssertionError("Zhuyin page toggle left stale keyboard pixels")
+        cases["keyboard_page_pixels"]={"second_page_png":page1_png,
+                                        "page0_restored":True}
+        restore(initial)
         for spelling,expected in (("ㄚ","阿"),("ㄇㄧㄥˊ","明")):
             restore(initial)
             routes=[]
@@ -162,7 +182,7 @@ def run(rom:Path,source:Path,output:Path):
         failures.append(type(exc).__name__+": "+str(exc))
     finally:
         gb.stop(save=False)
-        result={"passed":not failures and len(cases)==5,
+        result={"passed":not failures and len(cases)==6,
                 "cases":cases,"failures":failures,
                 "test":"real Taiwan Zhuyin 41-symbol two-page keypress, tones, selection/name"}
         (output/"zh_tw_zhuyin_runtime_report.json").write_text(
