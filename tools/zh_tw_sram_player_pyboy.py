@@ -149,12 +149,13 @@ def run(rom: Path, output: Path) -> dict:
         if save_route is None:
             raise AssertionError("Real START menu SAVE command unreachable using D-pad")
 
-        restore_state(open_menu)
-        for button in save_route[:-1]:
-            key(button, 55)
-        if selected_command() != 4:
-            raise AssertionError("SAVE route replay selected a different START menu command")
-        key("a", 55)
+        # The real-controller search above ALREADY navigated and selected
+        # STARTMENUITEM_SAVE=4. Do not replay the route with different frame
+        # delays: SRAM CI RED #44906021918 showed down(20) search succeeded
+        # but down(55) replay selected an unrelated command. Keep the
+        # actual verified game state at SaveMenu instead; no WRAM patching.
+        evidence["scenarios"]["start_menu"]["verified_save_route"] = save_route
+        evidence["scenarios"]["start_menu"]["save_menu_hook_count"] = len(save_menu)
         # SaveMenu hook occurs before the save question is ready for input.
         # Do not begin route search while the prompt is still rendering.
         rom_emulator.tick(120, render=True)
