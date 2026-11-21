@@ -254,6 +254,47 @@ def run(rom, source, folder):
         # QuickTB has six seven-byte keys: empty, A, AA, AB, AD, VD.
         key_v = gb.memory[table_bank, table_addr + 5*7]
         key_d = gb.memory[table_bank, table_addr + 5*7 + 1]
+        # Safety regression: Z and ZZ are lexicographically *after* the
+        # final Quick code (VD). Old GetPinyinNo read past the ROM table.
+        # Use the actual GBC controller and verify no crash, stuck screen,
+        # bogus candidates, stale name, or keyboard corruption.
+        key_z = key_v + (ord("Z") - ord("V"))
+        if key_z != 0x99:
+            raise AssertionError("Unsupported A-Z charmap assumption for Z")
+        path_z1, invalid_one = find_letter(baseline, key_z, 0)
+        restore(invalid_one)
+        if val("wIMEMaxLine") != 0:
+            raise AssertionError("Invalid Quick Z produced phantom candidate pages")
+        path_z2, invalid_two = find_letter(invalid_one, key_z, 1)
+        restore(invalid_two)
+        invalid_pointer = (val("wIMEBank"),
+                           val("wIMEAddr") | val("wIMEAddr", 1) << 8)
+        empty_pointer = gb.symbol_lookup("QuickCandidatesEmpty")
+        if invalid_pointer != empty_pointer:
+            raise AssertionError(f"Quick ZZ looked beyond last key: {invalid_pointer}")
+        if val("wIMEMaxLine") != 0:
+            raise AssertionError("Quick ZZ returned candidates from non-dictionary ROM")
+        if val("wNamingScreenCurNameLength") != 0:
+            raise AssertionError("Quick ZZ unexpectedly wrote player name")
+        if keyboard() != stable_keys:
+            raise AssertionError("Quick ZZ invalid input corrupted keyboard tilemap")
+        invalid_png = snapshot("invalid_ZZ_no_candidates")
+        key("b", 30)
+        if val("wIMEPinyin", 1) != ord("@"): # Game Boy @ terminator is mapped separately
+            # The @ byte in this project is $50, not Python ASCII $40.
+            if val("wIMEPinyin", 1) != 0x50:
+                raise AssertionError("B failed to remove last invalid Quick code")
+        key("b", 30)
+        if val("wIMEPinyin") != 0x50:
+            raise AssertionError("B failed to clear Quick composition")
+        if val("wNamingScreenCurNameLength") != 0:
+            raise AssertionError("Backspace over invalid Quick code altered player name")
+        result["scenarios"]["invalid_code_recovery"] = {
+            "input": "ZZ", "candidate_pages": 0, "name_bytes": 0,
+            "first_route": path_z1, "second_route": path_z2,
+            "invalid_screen": invalid_png, "backspace_cleared": True,
+        }
+        restore(baseline)
 
         path_v, first_state = find_letter(baseline, key_v, 0)
         restore(first_state)
@@ -295,7 +336,7 @@ def run(rom, source, folder):
         failures.append(type(exc).__name__ + ": " + str(exc))
     finally:
         gb.stop(save=False)
-        result["passed"] = not failures and len(result["scenarios"]) == 2
+        result["passed"] = not failures and len(result["scenarios"]) == 3
         report = folder / "zh_tw_quick_ui_report.json"
         report.write_text(json.dumps(result, ensure_ascii=False, indent=2) + "\n",
                           encoding="utf-8")
