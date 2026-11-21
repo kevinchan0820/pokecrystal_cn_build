@@ -50,15 +50,19 @@ def workbook_cells(path):
                         if isinstance(cell.value, str) and cell.value:
                             yield f"{ws.title}!{cell.coordinate}", cell.value
             elif ws.title in {"宝", "訓", "训", "类", "類", "城", "道", "招", "其"}:
-                col = 4
-                for row in ws.iter_rows(min_col=col, max_col=col):
+                # Row 1 is a Simplified-Chinese editor header, not ROM data.
+                for row in ws.iter_rows(min_row=2, min_col=4, max_col=4):
                     for cell in row:
                         if isinstance(cell.value, str) and cell.value:
                             yield f"{ws.title}!{cell.coordinate}", cell.value
             elif ws.title in {"图", "圖"}:
-                col = 5
-                for row in ws.iter_rows(min_col=col, max_col=col):
+                # The importer reads ONLY rows +6, +7, +8 in each group of 9.
+                # The other cells hold paths, source notes, and Simplified
+                # headers that are NOT displayed in the game.
+                for row in ws.iter_rows(min_col=5, max_col=5):
                     for cell in row:
+                        if (cell.row - 1) % 9 not in (5, 6, 7):
+                            continue
                         if isinstance(cell.value, str) and cell.value:
                             yield f"{ws.title}!{cell.coordinate}", cell.value
     finally:
@@ -69,10 +73,19 @@ def audit(root: Path, workbook: Path) -> dict:
     converter = OpenCC("s2twp")
     counts = Counter()
     remaining = []
+    non_idempotent = []
     flagged = []
     unclassified = []
     term_totals = Counter()
-    seen = set()
+    # These codepoints are exclusively Simplified Chinese in normal game UI.
+    # Do NOT flag valid official names: 尼多后, 隆隆岩, 大岩蛇, 高級球,
+    # 污泥炸彈, 干擾, 萬里無雲, etc. OpenCC is NOT an authority there.
+    exclusive_simplified = set(
+        "这们个宝梦灵图鉴边类设听还过连换战资关开场书语话国"
+        "妈总时长号选风轻东头电树体领门飞铁戏计动脑网线药"
+        "师学读乐鱼龙钟层声进退历实机击应产属张云强给"
+        "对从刚会热错数录画变条见写够误终页显样术"
+    )
 
     def add(location: str, value: str, source: str):
         if not any("\u3400" <= ch <= "\u9fff" for ch in value):
@@ -80,11 +93,22 @@ def audit(root: Path, workbook: Path) -> dict:
         counts[source + "_strings"] += 1
         proposed = converter.convert(value)
         if proposed != value:
+            counts["non_idempotent_opencc"] += 1
+            # OpenCC can produce WRONG alternatives such as 尼多後,
+            # 大巖蛇, 懷唸, 紀唸, 裡麵, 幹擾 or 高階球.
+            # Preserve these names and Taiwanese spellings in source text.
+            if len(non_idempotent) < 120:
+                non_idempotent.append({"where": location, "source": source,
+                                       "text": value[:140], "opencc_suggests": proposed[:140]})
+        glyphs = sorted({ch for ch in value if ch in exclusive_simplified})
+        if glyphs:
             counts["unconverted"] += 1
             if len(remaining) < 300:
                 remaining.append({"where": location, "source": source,
-                                  "text": value[:140], "converted": proposed[:140]})
+                                  "text": value[:140], "simplified_glyphs": glyphs})
         for term, reason in TERM_FLAGS.items():
+            if source == "ime_characters":
+                continue
             k = value.count(term)
             if k:
                 term_totals[term] += k
@@ -113,7 +137,7 @@ def audit(root: Path, workbook: Path) -> dict:
                     continue
                 where = f"{rel}:{lineno}"
                 if display:
-                    add(where, value, "asm")
+                    add(where, value, "ime_characters" if rel.startswith("data/ime/") else "asm")
                 else:
                     counts["uncategorized_chinese_literal"] += 1
                     if len(unclassified) < 150:
@@ -128,6 +152,7 @@ def audit(root: Path, workbook: Path) -> dict:
         },
         "counts": dict(counts),
         "unconverted": remaining,
+        "opencc_non_idempotent_examples": non_idempotent,
         "regional_term_counts": dict(term_totals),
         "regional_term_examples": flagged,
         "unclassified_literals": unclassified,
