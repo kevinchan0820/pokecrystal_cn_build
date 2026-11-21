@@ -64,8 +64,18 @@ def main():
             raise SystemExit("FAIL: report does not pass: " + filename + "." + key)
         checks[label] = {"passed": True, "report": filename, "sha256": digest(file)}
     for name in SCREENS:
-        if not Path(name).is_file():
+        screen = Path(name)
+        if not screen.is_file():
             raise SystemExit("FAIL: real PyBoy screenshot missing: " + name)
+        # RED regression: a placeholder, truncated PNG, or resized illustration
+        # must never satisfy the raw 160x144 hardware-frame evidence gate.
+        with screen.open("rb") as fh:
+            header = fh.read(24)
+        if (len(header) != 24 or header[:8] != b"\x89PNG\r\n\x1a\n"
+                or header[12:16] != b"IHDR"
+                or int.from_bytes(header[16:20], "big") != 160
+                or int.from_bytes(header[20:24], "big") != 144):
+            raise SystemExit("FAIL: screenshot is not a raw 160x144 PNG: " + name)
     patch = Path("Crystal_Traditional_Chinese_TWHK_1x.ips")
     manifest = json.loads(Path("zh_tw_patch_manifest.json").read_text(encoding="utf-8"))
     if digest(patch) != manifest.get("patch_sha256"):
