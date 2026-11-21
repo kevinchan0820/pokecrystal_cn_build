@@ -128,15 +128,47 @@ def run(rom: Path, output: Path) -> dict:
             raise AssertionError("Real START menu SAVE command unreachable using D-pad")
 
         restore_state(open_menu)
-        before_save = len(saved_player)
         for button in save_route:
             key(button, 55)
-        for _ in range(8):
-            if len(saved_player) > before_save:
+        evidence["scenarios"]["save_prompt"] = {
+            "menu_route": save_route, "screen": snapshot("game_save_yes_no")}
+        # Search *controller actions* on the actual game's yes/no screen.
+        # Default choice cannot be assumed from earlier menu input.
+        # State snapshots are only used to select a reliable route; the
+        # final route is replayed from the original save dialog.
+        at_prompt = capture_state()
+        confirmation_routes = [
+            ("a",), ("up", "a"), ("down", "a"),
+            ("a", "a"), ("up", "a", "a"), ("down", "a", "a"),
+            ("a", "up", "a"), ("a", "down", "a"),
+            ("up", "up", "a"), ("a", "a", "a"),
+            ("left", "a"), ("right", "a"),
+            ("a", "up", "up", "a"), ("a", "down", "down", "a"),
+        ]
+        confirmation = None
+        for route in confirmation_routes:
+            restore_state(at_prompt)
+            count_before = len(saved_player)
+            for button in route:
+                key(button, 90)
+                if len(saved_player) > count_before:
+                    confirmation = list(route)
+                    break
+            if confirmation:
                 break
-            key("a", 90)  # select YES on the actual game SAVE dialog
-        if len(saved_player) <= before_save:
-            raise AssertionError("In-game SavePlayerData never executed")
+        if confirmation is None:
+            evidence["scenarios"]["save_prompt"]["after_rejection"] = snapshot(
+                "save_yes_no_unresolved")
+            raise AssertionError("In-game SAVE yes/no was never confirmed; explored "+
+                                 str(len(confirmation_routes))+" actual D-pad routes")
+        restore_state(at_prompt)
+        count_before = len(saved_player)
+        for button in confirmation:
+            key(button, 90)
+            if len(saved_player) > count_before:
+                break
+        if len(saved_player) <= count_before:
+            raise AssertionError("Real game SAVE did not replay verified controller route")
         rom_emulator.tick(160, render=True)
         if not value("wSaveFileExists"):
             raise AssertionError("Game never marked actual SRAM save as present")
@@ -145,7 +177,7 @@ def run(rom: Path, output: Path) -> dict:
         if name_after_save != expected_name:
             raise AssertionError("In-game SAVE changed player name in WRAM")
         evidence["scenarios"]["game_save"] = {
-            "save_menu_route": save_route,
+            "save_menu_route": save_route, "confirmation_route": confirmation,
             "save_player_data_hook": True,
             "screen": snapshot("saved_in_game"),
             "name_bytes": name_after_save}
