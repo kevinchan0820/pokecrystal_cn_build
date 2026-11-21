@@ -32,7 +32,7 @@ def inspect(source: Path) -> dict:
         label = f"CharTB_{territory}_Common::"
         if label not in quick_text:
             raise ValueError(f"Missing 1.x quick-name label: {label}")
-        section = quick_text.split(label, 1)[1].split("\\nCharTB_", 1)[0]
+        section = quick_text.split(label, 1)[1].split("\nCharTB_", 1)[0]
         choices = "".join(INPUT_ENTRY.findall(section)).replace("@", "")
         quick_lists[territory] = choices
         if len(choices) < 48:
