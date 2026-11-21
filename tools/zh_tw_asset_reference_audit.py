@@ -47,9 +47,12 @@ def scan(root: Path):
             bare = line.lstrip()
             if bare.startswith(";") or bare.startswith("#"):
                 continue
+            # Assembly ';' begins an inline comment. Counting text after it
+            # produces false-positive "loaded" assets and misleading QA.
+            code = line.split(";", 1)[0] if file.suffix in {".asm", ".inc"} else line
             for asset, patterns in TARGETS.items():
-                if any(pat.lower() in line.lower() for pat in patterns):
-                    matches[asset].append({"file": rel, "line": lineno, "snippet": line.strip()[:220]})
+                if any(pat.lower() in code.lower() for pat in patterns):
+                    matches[asset].append({"file": rel, "line": lineno, "snippet": code.strip()[:220]})
     return {
         "files_scanned": files_scanned,
         "assets": {
