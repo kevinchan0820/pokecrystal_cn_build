@@ -142,6 +142,14 @@ def build(root, workbook, fontname, report, pointsize, extra_text=None):
     font_index = 3 if Path(fontname).name == "NotoSansCJK-Regular.ttc" else 0
     chosen_font = ImageFont.truetype(fontname, size=pointsize, index=font_index)
     changed = set()
+    # Crucial: a Unicode character can map to a valid *existing* GB2312
+    # slot whose bitmap was drawn in Simplified-Chinese regional style.
+    # Rerender every used existing Han character with the Taiwan font face.
+    # Without this step a text audit can pass while the screen still shows
+    # Simplified glyph shapes for shared Unicode codepoints.
+    redraw_existing = {ch: existing[ch] for ch in required if ch in existing}
+    for character, (hi, lo) in sorted(redraw_existing.items()):
+        changed.add(write_glyph(root, hi, lo, render(character, chosen_font)))
     for character, (hi, lo, old) in additions.items():
         changed.add(write_glyph(root, hi, lo, render(character, chosen_font)))
 
@@ -157,6 +165,7 @@ def build(root, workbook, fontname, report, pointsize, extra_text=None):
         "required_han": len(required),
         "existing_han": len(existing),
         "added_glyphs": len(additions),
+        "existing_glyphs_redrawn_with_tw_font": len(redraw_existing),
         "rewritten_font_files": sorted(changed),
         "failed_chars": failures,
         "warning": "Generated bitmap characters need visual and emulator QA.",
