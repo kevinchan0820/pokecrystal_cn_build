@@ -112,6 +112,16 @@ def run(rom, source, folder):
             raise AssertionError("Quick mode wasn't selected")
 
         result["initial_image"] = snapshot("quick_initial")
+        # Chinese is 12px tall. The old PlaceString label produced only
+        # an 8px chopped upper half, leaving the lower tile row blank.
+        pixels = gb.screen.image.convert("RGB")
+        second_row_ink = sum(
+            1 for y in range(56, 64) for x in range(10, 64)
+            if sum(pixels.getpixel((x, y))) < 300)
+        result["status_label_lower_half_ink_pixels"] = second_row_ink
+        if second_row_ink < 8:
+            raise AssertionError(
+                f"Quick status label still clipped/missing lower Chinese strokes ({second_row_ink} pixels)")
         stable_keys = keyboard()
         baseline = state()
         # Read the *same input encoding used by the assembled dictionary*.
