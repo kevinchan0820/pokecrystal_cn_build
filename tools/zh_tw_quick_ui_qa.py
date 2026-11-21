@@ -269,7 +269,7 @@ def run(rom, source, folder):
         restore(invalid_two)
         invalid_pointer = (val("wIMEBank"),
                            val("wIMEAddr") | val("wIMEAddr", 1) << 8)
-        empty_pointer = gb.symbol_lookup("QuickCandidatesEmpty")
+        empty_pointer = gb.symbol_lookup("QuickV2CandidatesEmpty")
         if invalid_pointer != empty_pointer:
             raise AssertionError(f"Quick ZZ looked beyond last key: {invalid_pointer}")
         if val("wIMEMaxLine") != 0:
@@ -302,7 +302,7 @@ def run(rom, source, folder):
         key("a", 40)
         single_pointer = (val("wIMEBank"),
                           val("wIMEAddr") | val("wIMEAddr", 1) << 8)
-        if single_pointer != gb.symbol_lookup("QuickCandidatesA"):
+        if single_pointer != gb.symbol_lookup("QuickV2_A"):
             raise AssertionError(f"Quick A doesn't resolve to its multiple candidates: {single_pointer}")
         if val("wIMEMaxLine") != 1:
             raise AssertionError("Quick A multi-candidate list missing its candidate row")
@@ -354,7 +354,7 @@ def run(rom, source, folder):
         result["code_VD_image"] = snapshot("typed_VD")
         if keyboard() != stable_keys:
             raise AssertionError("Entering VD overwrote alphabet keyboard tiles")
-        candidate_bank, pointer = gb.symbol_lookup("QuickCandidatesVD")
+        candidate_bank, pointer = gb.symbol_lookup("QuickV2_VD")
         got_pointer = (val("wIMEBank"),
                        val("wIMEAddr") | val("wIMEAddr", 1) << 8)
         if got_pointer != (candidate_bank, pointer):
