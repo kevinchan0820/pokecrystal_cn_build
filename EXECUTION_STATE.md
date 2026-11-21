@@ -1,5 +1,16 @@
 # Crystal 1.x — durable execution state
 
+## 2026-11-21 — asset-reference audit inline-comment RED/GREEN
+
+- Read canonical AI_HANDOFF.md, AGENTS.md, current Superpowers autonomous contract, acceptance and project skill; fetched build/source file contents from the 1.x branch. Earlier #44873879766 is green for source `525f6728ec3d04ede5517fe079a462db72670aab`, build `8ef9e14b5f88640d83e26ce6d1bb8d4d56d12d4f`; it is **not** exact-head proof for this change.
+- **Root cause:** `tools/zh_tw_asset_reference_audit.py` searched the entire ASM line after skipping only full-line comments. A line like `db $00 ; INCBIN "gfx/new_game/name_chinese.2bpp"` was incorrectly counted as a live graphics source reference. This risks falsely classifying unverified raster as used.
+- **RED test commit:** [e556f4a](https://github.com/kevinchan0820/pokecrystal_cn_build/commit/e556f4a380b98d65111a0b9d714f7d2c666918e6) adds `test_inline_asm_comment_is_not_a_reference`. Before repair, the implementation would report a false reference (logical RED; full remote CI red log not yet retrieved).
+- **Implementation commit:** [2659ffe](https://github.com/kevinchan0820/pokecrystal_cn_build/commit/2659ffefc44f48a07baa676d7fc9707982879c00) strips inline semicolon comments for .asm/.inc before checking references, preserving other source file formats. New unit test expects zero references. **Fresh exact-head CI/PyBoy result NOT YET VERIFIED**; no claim of full GREEN, no ROM rebuild claimed in this checkpoint.
+- Historical artifact #44873879766 contains actual 160x144 PyBoy Quick root screenshots and 4x nearest-neighbor copies, but lacks `zh_tw_ci_handoff.json` (handoff step was added later). Source 26-key screen-pixel regression was previously green; human legibility remains unapproved.
+- **Single next executable step:** retrieve fresh workflow run triggered by `2659ffe`, inspect `test_zh_tw_asset_reference_audit.py` result, ROM compile and PyBoy artifacts; if red, fetch full job logs and repair. Then use `zh_tw_asset_reference_report.json` to trace actual `gfx/new_game/name_chinese.png` usage and capture in-game scene before any raster-localization claim.
+- **Release blockers:** real Quick dictionary/ambiguity/paging, full Cangjie and Zhuyin, SRAM/nickname, Bag/Trainer Card/burned-battle PyBoy screenshots, name_chinese runtime classification, 8x8 legibility, all-scene language QA. 1.x BLOCKED; 1.0 untouched.
+
+
 ## Verified checkpoint — 2026-11-21: ALL 26 Cangjie root keys now visible in actual PyBoy
 
 - **Latest exact-head success:** [GitHub Actions #44873879766](https://github.com/kevinchan0820/pokecrystal_cn_build/actions/runs/44873879766) **SUCCESS**, source `525f6728ec3d04ede5517fe079a462db72670aab`, build code `8ef9e14b5f88640d83e26ce6d1bb8d4d56d12d4f`. Passed full ROM/IPS creation, boot, options, five naming modes, Quick AA→晶 / AB→明 / VD→好, Trainer Card approved 目前狀態 bitmap, five canonical battle strings.
