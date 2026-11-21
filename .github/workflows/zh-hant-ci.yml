@@ -59,6 +59,9 @@ jobs:
       - name: Deep PyBoy naming QA - pages, finish, byte limits
         if: success()
         run: .venv/bin/python tools/zh_tw_naming_deep.py build/pokecrystal11.gbc --output . --strict
+      - name: Verify real Quick code-to-character input using PyBoy
+        if: success()
+        run: .venv/bin/python tools/zh_tw_quick_pyboy.py build/pokecrystal11.gbc --source pokecrystal_cn --output . --strict
       - name: Build verified clean Crystal and generate a patch
         if: success()
         run: |
