@@ -13,6 +13,8 @@ from pathlib import Path
 from openpyxl import load_workbook
 
 CANONICAL = {
+    ("文3", "E2337"): "受到了灼傷的傷害！",
+    ("文3", "E2429"): "敵人的【0】",
     ("文3", "E2829"): "擊中了要害！",
     ("文3", "E2837"): "效果絕佳！",
     ("文3", "E2842"): "效果不太好<……>",
