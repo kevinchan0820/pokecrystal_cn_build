@@ -1,0 +1,313 @@
+{
+  "schema_version": 1,
+  "locale": "zh-Hant-TW",
+  "note": "Exact-match, context-scoped UI edits only. OpenCC s2twp runs before this stage. Full dialogue QA is separate.",
+  "ui_rules": [
+    {
+      "id": "start-menu-save",
+      "path": "engine/menus/start_menu.asm",
+      "from": "記錄@",
+      "to": "儲存@",
+      "reason": "Save command is an action. Taiwan game UI uses 儲存 rather than 記錄 for the control.",
+      "source_url": "https://support.nintendo.com/hk/switch2/mastery/accessibility/index.html"
+    },
+    {
+      "id": "main-menu-new-game",
+      "path": "engine/menus/main_menu.asm",
+      "from": "從頭開始@",
+      "to": "新遊戲@",
+      "reason": "Concise and natural title-menu label for starting a new save.",
+      "source_url": "https://tw.portal-pokemon.com/special/pika_vee/tc/howtoplay/"
+    },
+    {
+      "id": "options-print-density",
+      "path": "engine/menus/options_menu.asm",
+      "from": "打印濃度",
+      "to": "列印濃度",
+      "reason": "Taiwan Traditional Chinese calls printing 列印.",
+      "source_url": "https://support.nintendo.com/hk/switch2/mastery/accessibility/index.html"
+    },
+    {
+      "id": "stats-ot-short-label",
+      "path": "engine/pokemon/stats_screen.asm",
+      "from": "初訓家/@",
+      "to": "訓練家/@",
+      "reason": "OT = Original Trainer; current stats layout starts owner name at x14, 6 tiles after x8 label. 原訓練家 needs 8 tiles and would overlap name; 訓練家 is 6 tiles and remains recognizable in context.",
+      "source_url": "https://wiki.52poke.com/zh-hant/初訓家"
+    },
+    {
+      "id": "trainer-card-pocket-money",
+      "path": "engine/menus/trainer_card.asm",
+      "from": "零花錢@",
+      "to": "零用錢@",
+      "reason": "Taiwan/Hong Kong common writing uses 零用錢 for pocket money; preserve exactly three Chinese glyphs.",
+      "source_url": "https://en.wiktionary.org/wiki/零用錢"
+    },
+    {
+      "id": "trade-original-trainer-label",
+      "path": "engine/movie/trade_animation.asm",
+      "from": "初訓家/",
+      "to": "訓練家/",
+      "reason": "Trade detail window shows Original Trainer and has a fixed 3-Han-glyph label; keep the label readable and within the original layout.",
+      "source_url": "https://wiki.52poke.com/zh-hant/初訓家"
+    },
+    {
+      "id": "trade-egg-original-trainer-label",
+      "path": "engine/movie/trade_animation.asm",
+      "from": "初訓家/?????",
+      "to": "訓練家/?????",
+      "reason": "Trade egg detail also uses Original Trainer label; same display-width constraint.",
+      "source_url": "https://wiki.52poke.com/zh-hant/初訓家"
+    },
+    {
+      "id": "options-text-speed",
+      "path": "engine/menus/options_menu.asm",
+      "from": "語速",
+      "to": "文字速度",
+      "reason": "Text Speed setting; Taiwan natural UI label",
+      "source_url": "https://wiki.52poke.com/zh-hant/設置"
+    },
+    {
+      "id": "options-battle-animation",
+      "path": "engine/menus/options_menu.asm",
+      "from": "對戰動畫",
+      "to": "戰鬥動畫",
+      "reason": "Controls playback of in-battle graphical move animations",
+      "source_url": "https://wiki.52poke.com/zh-hant/設置"
+    },
+    {
+      "id": "options-battle-style",
+      "path": "engine/menus/options_menu.asm",
+      "from": "比賽規則",
+      "to": "對戰規則",
+      "reason": "Battle Style is Shift/Set, not tournament rules",
+      "source_url": "https://wiki.52poke.com/zh-hant/設置"
+    },
+    {
+      "id": "options-frame-style",
+      "path": "engine/menus/options_menu.asm",
+      "from": "邊框       型別",
+      "to": "邊框樣式",
+      "reason": "Frame choice already rendered as 1–8 in the options screen",
+      "source_url": "https://en.wikibooks.org/wiki/Pok%C3%A9mon_Crystal/Options"
+    },
+    {
+      "id": "options-battle-anim-on",
+      "path": "engine/menus/options_menu.asm",
+      "from": "看　@",
+      "to": "開啟@",
+      "reason": "Animation ON versus OFF, not look/do not look",
+      "source_url": "https://wiki.52poke.com/zh-hant/設置"
+    },
+    {
+      "id": "options-battle-anim-off",
+      "path": "engine/menus/options_menu.asm",
+      "from": "不看@",
+      "to": "關閉@",
+      "reason": "Animation ON versus OFF, not look/do not look",
+      "source_url": "https://wiki.52poke.com/zh-hant/設置"
+    },
+    {
+      "id": "start-menu-save-description-1",
+      "path": "engine/menus/start_menu.asm",
+      "from": "在休息之前",
+      "to": "儲存目前的",
+      "reason": "Save can be performed any time; don't imply sleep",
+      "source_url": "https://en.wikibooks.org/wiki/Pok%C3%A9mon_Crystal"
+    },
+    {
+      "id": "start-menu-save-description-2",
+      "path": "engine/menus/start_menu.asm",
+      "from": "先記錄狀態@",
+      "to": "冒險進度@",
+      "reason": "Save persists adventure progress",
+      "source_url": "https://en.wikibooks.org/wiki/Pok%C3%A9mon_Crystal"
+    },
+    {
+      "id": "start-menu-options-description-1",
+      "path": "engine/menus/start_menu.asm",
+      "from": "對規則等等",
+      "to": "調整遊戲設定",
+      "reason": "Describe actual options without awkward wording",
+      "source_url": "https://en.wikibooks.org/wiki/Pok%C3%A9mon_Crystal/Options"
+    },
+    {
+      "id": "start-menu-options-description-2",
+      "path": "engine/menus/start_menu.asm",
+      "from": "進行調整@",
+      "to": "與操作選項@",
+      "reason": "Second line completes option description",
+      "source_url": "https://en.wikibooks.org/wiki/Pok%C3%A9mon_Crystal/Options"
+    },
+    {
+      "id": "main-menu-options",
+      "path": "engine/menus/main_menu.asm",
+      "from": "重新設定@",
+      "to": "設定@",
+      "reason": "This entry opens options, not a reset",
+      "source_url": "https://github.com/pret/pokecrystal/blob/master/engine/menus/main_menu.asm"
+    }
+  ],
+  "editorial_review": [
+    {
+      "term": "初訓家",
+      "english": "Original Trainer (OT)",
+      "official_or_existing": "初訓家",
+      "proposed_plain_language": "原訓練家",
+      "status": "short stats-screen label set to 訓練家 (pending gameplay screenshot)",
+      "source_url": "https://wiki.52poke.com/zh-hant/初訓家",
+      "note": "Original trainer has a 3 Han-glyph label width in stats screen; longer 原訓練家 would overlap OT name. Keep explicit Original Trainer meaning in documentation."
+    },
+    {
+      "term": "拼音排序模式",
+      "status": "requires functional check",
+      "note": "Cannot rename to 注音排序 until sorting engine genuinely uses that order."
+    },
+    {
+      "term": "裝置",
+      "status": "requires game-system terminology review",
+      "note": "Pokegear should be compared with established Taiwan term, limited to available display width."
+    },
+    {
+      "term": "寶可夢訓練家",
+      "status": "keep",
+      "note": "Normal official Taiwan term; not a mainland-only expression."
+    }
+  ],
+  "review_flags": [
+    "信息",
+    "數據",
+    "打印",
+    "初訓家",
+    "網絡",
+    "軟件",
+    "存檔",
+    "從頭開始",
+    "記錄",
+    "拼音排序",
+    "效果拔群",
+    "好像效果不好",
+    "甭",
+    "啥",
+    "邊框       類型",
+    "重新設置",
+    "比賽規則",
+    "對戰動畫",
+    "语速",
+    "边框",
+    "类型",
+    "設置",
+    "邊框       型別"
+  ],
+  "workbook_phrase_rules": [
+    {
+      "id": "dialogue-pocket-money",
+      "scope": "dialogue",
+      "from": "零花錢",
+      "to": "零用錢",
+      "evidence": "Taiwan conventional usage and equivalent semantics",
+      "source_url": "https://en.wiktionary.org/wiki/零用錢",
+      "expected_count": 3
+    },
+    {
+      "id": "battle-not-very-effective",
+      "scope": "dialogue",
+      "from": "好像效果不好<……>",
+      "to": "效果不太好<……>",
+      "reason": "Niantic's Traditional Chinese Pokémon GO help explicitly calls the ineffective-hit message「效果不太好」; preserve the existing imported control token <……>.",
+      "source_url": "https://niantic.helpshift.com/hc/zh-hant/6-pokemon-go/faq/2132-type-effectiveness-in-battle/",
+      "expected_count": 1,
+      "sheet": "文3",
+      "cell": "E2842"
+    },
+    {
+      "id": "rocket-prc-slang",
+      "sheet": "文1",
+      "cell": "E5304",
+      "from": "火箭隊啥都幹！",
+      "to": "火箭隊什麼都做！",
+      "source_gloss": "Everything we do is for profit.",
+      "scope": "dialogue",
+      "expected_count": 1,
+      "reason": "Verified directly against English/Japanese source rows; preserve dialogue meaning and short GBC lines."
+    },
+    {
+      "id": "impressive-natural",
+      "sheet": "文2",
+      "cell": "E3080",
+      "from": "有點那啥……",
+      "to": "還真不簡單……",
+      "source_gloss": "wow, impressively",
+      "scope": "dialogue",
+      "expected_count": 1,
+      "reason": "Verified directly against English/Japanese source rows; preserve dialogue meaning and short GBC lines."
+    },
+    {
+      "id": "no-more-pokemon",
+      "sheet": "文3",
+      "cell": "E313",
+      "from": "甭想帶走更多，",
+      "to": "別想帶走更多，",
+      "source_gloss": "You can't take any more #MON.",
+      "scope": "dialogue",
+      "expected_count": 1,
+      "reason": "Verified directly against English/Japanese source rows; preserve dialogue meaning and short GBC lines."
+    },
+    {
+      "id": "favorite-rapidash",
+      "sheet": "文5",
+      "cell": "E5239",
+      "from": "那啥……那就先介紹",
+      "to": "那麼……先來介紹",
+      "source_gloss": "So... my favorite RAPIDASH...",
+      "scope": "dialogue",
+      "expected_count": 1,
+      "reason": "Verified directly against English/Japanese source rows; preserve dialogue meaning and short GBC lines."
+    },
+    {
+      "id": "grandpa-surprised",
+      "sheet": "文5",
+      "cell": "E5285",
+      "from": "……啥？不是？",
+      "to": "……咦？不是？",
+      "source_gloss": "No? Oh...",
+      "scope": "dialogue",
+      "expected_count": 1,
+      "reason": "Verified directly against English/Japanese source rows; preserve dialogue meaning and short GBC lines."
+    },
+    {
+      "id": "blank-page",
+      "sheet": "文6",
+      "cell": "E4389",
+      "from": "接下來就啥也沒寫了……",
+      "to": "下一頁什麼都沒寫……",
+      "source_gloss": "The next page is... Blank!",
+      "scope": "dialogue",
+      "expected_count": 1,
+      "reason": "Verified directly against English/Japanese source rows; preserve dialogue meaning and short GBC lines."
+    },
+    {
+      "id": "move-deleter-house",
+      "sheet": "文7",
+      "cell": "E5194",
+      "from": "啥都能忘記？爺爺的家",
+      "to": "遺忘爺爺的家",
+      "source_gloss": "MOVE DELETER'S HOUSE",
+      "source_url": "https://wiki.52poke.com/zh-hant/遺忘爺爺",
+      "scope": "dialogue",
+      "expected_count": 1,
+      "reason": "Verified directly against English/Japanese source rows; preserve dialogue meaning and short GBC lines."
+    },
+    {
+      "id": "tully-phone-surprised",
+      "sheet": "文8",
+      "cell": "E5586",
+      "from": "喂，我是禾念。啥？",
+      "to": "喂，我是禾念。咦？",
+      "source_gloss": "Yup, TULLY here... <PLAY_G>? What?",
+      "scope": "dialogue",
+      "expected_count": 1,
+      "reason": "Verified directly against English/Japanese source rows; preserve dialogue meaning and short GBC lines."
+    }
+  ]
+}

@@ -3,8 +3,9 @@
 from openpyxl import Workbook
 from openpyxl.comments import Comment
 from openpyxl import load_workbook
+import os
 
-wb = load_workbook('./text.xlsx', data_only=True)
+wb = load_workbook(os.environ.get('PMC_TEXT_XLSX', './text.xlsx'), data_only=True)
 
 # import pokemon name
 def import_pokemon():
@@ -18,7 +19,14 @@ def import_pokemon():
         if 'db_w "' in line:
             name = ws.cell(row = wbi, column = 4).value
             wbi += 1
-            name_len = len(name.encode(encoding = 'gb2312'))
+            if not isinstance(name, str) or not name:
+                file_opt.append(line)
+                continue
+            # The ROM name table is ten *encoded* bytes wide. DFS stores
+            # Chinese glyphs as two bytes, including glyphs outside GB2312.
+            name_len = sum(2 if ord(ch) > 127 else 1 for ch in name)
+            if name_len > 10:
+                raise ValueError("Pokémon name exceeds 10 bytes: " + name)
             name_pad = name + '@' * (10 - name_len)
             line_sp = line.split('"')
             line_sp[1] = name_pad
@@ -39,6 +47,9 @@ def import_trainer():
         if 'db_w "' in line and line[0] != ';':
             name = ws.cell(row = wbi, column = 4).value
             wbi += 1
+            if not isinstance(name, str) or not name:
+                file_opt.append(line)
+                continue
             line_sp = line.split('"')
             line_sp[1] = name + '@'
             line = '"'.join(line_sp)
@@ -58,6 +69,9 @@ def import_class():
         if 'li "' in line:
             name = ws.cell(row = wbi, column = 4).value
             wbi += 1
+            if not isinstance(name, str) or not name:
+                file_opt.append(line)
+                continue
             line_sp = line.split('"')
             line_sp[1] = name
             line = '"'.join(line_sp)
@@ -77,6 +91,9 @@ def import_map():
         if 'db_w "' in line:
             name = ws.cell(row = wbi, column = 4).value
             wbi += 1
+            if not isinstance(name, str) or not name:
+                file_opt.append(line)
+                continue
             line_sp = line.split('"')
             line_sp[1] = name + '@'
             line = '"'.join(line_sp)
@@ -98,6 +115,9 @@ def import_item():
         elif 'li "' in line:
             name = ws.cell(row = wbi, column = 4).value
             wbi += 1
+            if not isinstance(name, str) or not name:
+                file_opt.append(line)
+                continue
             line_sp = line.split('"')
             line_sp[1] = name
             line = '"'.join(line_sp)
@@ -117,6 +137,9 @@ def import_move():
         if 'li "' in line:
             name = ws.cell(row = wbi, column = 4).value
             wbi += 1
+            if not isinstance(name, str) or not name:
+                file_opt.append(line)
+                continue
             line_sp = line.split('"')
             line_sp[1] = name
             line = '"'.join(line_sp)
