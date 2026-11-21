@@ -47,8 +47,11 @@ class ZhuyinFullTests(unittest.TestCase):
              "pokecrystal_cn/engine/dfs/zhuyin_lookup.asm").read_text(
                  encoding="utf-8")
         dispatch=src.split("ZhuyinLookup::",1)[1].split("ld c, a",1)[0]
-        self.assertIn('sub "A"\\n\\tjp c, .no_result',dispatch)
-        self.assertIn('cp 37\\n\\tjp nc, .no_result',dispatch)
+        instructions=[line.strip() for line in dispatch.splitlines()
+                      if line.strip() and not line.strip().startswith(";")]
+        adjacent=list(zip(instructions,instructions[1:]))
+        self.assertIn(('sub "A"','jp c, .no_result'),adjacent)
+        self.assertIn(('cp 37','jp nc, .no_result'),adjacent)
 
 if __name__=="__main__":
     unittest.main()
