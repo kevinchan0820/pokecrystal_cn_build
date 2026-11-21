@@ -235,8 +235,20 @@ def run(rom, source, folder):
             raise AssertionError(
                 f"GBC $7f blank tile overwritten: {ink} garbage pixels in empty name panel")
         key("select", 35)
+        if val("wNamingScreenLetterCase") != 6:
+            raise AssertionError("Cangjie -> genuine Zhuyin mode6 transition failed")
+        result["zhuyin_mode6_initial"] = snapshot("zhuyin_page0")
+        # 41 symbols/tones on two native 26-cell pages, unchanged grid.
+        page_before = gb.screen.image.copy().crop((8, 64, 152, 88))
+        key("start", 30)
+        result["zhuyin_mode6_page1"] = snapshot("zhuyin_page1")
+        if val("wIMEFullCandidateCount") != 1:
+            raise AssertionError("START failed to switch to phonetic page1")
+        if gb.screen.image.copy().crop((8,64,152,88)).tobytes() == page_before.tobytes():
+            raise AssertionError("Zhuyin page1 keyboard looks identical to page0")
+        key("select", 35)
         if val("wNamingScreenLetterCase") != 0:
-            raise AssertionError("Cangjie -> Pinyin mode transition failed")
+            raise AssertionError("Zhuyin -> Pinyin mode transition failed")
         if any(key_pixels(i) == expanded_root(i) for i in samples):
             raise AssertionError("Latin keyboard glyphs not restored after leaving Quick")
         latin_screen = gb.screen.image.copy()
