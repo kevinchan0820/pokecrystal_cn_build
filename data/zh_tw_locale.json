@@ -86,7 +86,7 @@
     {
       "id": "options-frame-style",
       "path": "engine/menus/options_menu.asm",
-      "from": "邊框       類型",
+      "from": "邊框       型別",
       "to": "邊框樣式",
       "reason": "Frame choice already rendered as 1–8 in the options screen",
       "source_url": "https://en.wikibooks.org/wiki/Pok%C3%A9mon_Crystal/Options"
@@ -196,7 +196,8 @@
     "语速",
     "边框",
     "类型",
-    "設置"
+    "設置",
+    "邊框       型別"
   ],
   "workbook_phrase_rules": [
     {
