@@ -159,6 +159,10 @@ def run(rom, source, folder):
             "letter_a_vram_bank1": vram_bytes(1,0),
             "root_a_expected": list(expanded_root(0)),
         }
+        if any(x & 8 for x in keyboard_attrs):
+            raise AssertionError(
+                "Quick root keyboard must render from VRAM bank 0: found " +
+                str([x for x in keyboard_attrs if x & 8]))
         # SELECT from Quick to Pinyin must restore the stock Latin alphabet.
         key("select", 35)
         if val("wNamingScreenLetterCase") != 0:
