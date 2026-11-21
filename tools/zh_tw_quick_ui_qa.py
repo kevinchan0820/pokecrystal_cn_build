@@ -117,13 +117,11 @@ def run(rom, source, folder):
         # the half-rendered Chinese header looked like corrupted text.
         bank, start = addr["wTilemap"]
         tile = lambda row, col: gb.memory[bank, start + row*20 + col]
-        expected_label_tiles = [
-            tile(9, 1),  # Q
-            tile(9, 5),  # U
-            tile(8, 10), # I
-            tile(8, 3),  # C
-            tile(8, 13), # K
-        ]
+        # In this project the ASCII charmap is contiguous from A=$80.
+        # Never sample Q/U from hardcoded keyboard grid coordinates: the
+        # English keyboard is laid out in GBC tile columns, not the text
+        # characters' sequential index, and our prior test falsely failed.
+        expected_label_tiles = [0x90, 0x94, 0x88, 0x82, 0x8A]  # Q U I C K
         actual_label_tiles = [tile(6, col) for col in range(1, 6)]
         result["quick_label_tiles"] = {
             "actual": actual_label_tiles, "expected": expected_label_tiles}
