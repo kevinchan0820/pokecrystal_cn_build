@@ -22,8 +22,11 @@ fi
 
 # Keep the original text.xlsx and original fork branches untouched.
 # The submodule is normally pinned; select the translation work branch explicitly.
-git -C pokecrystal_cn fetch origin work/zh-hant-tw
+# The 1.x branch builds from its own source fork, never the vanilla 1.0 head.
+SOURCE_BRANCH="${ZH_TW_SOURCE_BRANCH:-feature/zh-hant-tw-hk-1x}"
+git -C pokecrystal_cn fetch origin "$SOURCE_BRANCH"
 git -C pokecrystal_cn checkout --detach FETCH_HEAD
+echo "Using 1.x source: $SOURCE_BRANCH ($(git -C pokecrystal_cn rev-parse --short HEAD))"
 # Fail before building if the original Simplified title graphic is still present.
 python3 tools/zh_tw_title_check.py
 python3 tools/zh_tw_prepare.py \
