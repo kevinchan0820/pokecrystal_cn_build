@@ -1,5 +1,14 @@
 # Crystal 1.x — durable execution state
 
+## Checkpoint — 2026-11-21 — full Cangjie invalid-code PyBoy safety gate
+
+- Read latest AI_HANDOFF.md, AGENTS.md, SUPERPOWERS_EXECUTION.md, TRUE_IME_ACCEPTANCE.md, skill and current source/build code. Earlier handoff incorrectly says Cangjie is unimplemented: current `engine/dfs/ime.asm` already has mode 5, five-root composition and bounded `CangjieLookup`, and current CI workflow includes `tools/zh_tw_cangjie_pyboy.py`. Use live code, not stale handoff wording.
+- **New actual test:** build branch `8384fe9c2d7aaf5c85213b2978575961156440e5` adds real controller `ZZZZZ` in Cangjie mode 5, asserting zero candidates/pages, unchanged player name, and B removes fifth code. Follow-up `eab053aea6e4bd9a0b1b6770d00d71ad31edf96d` compares name bytes to real pre-input baseline rather than assuming the blank name byte is $50. Test also saves an actual PyBoy `zh_tw_cangjie_invalid_ZZZZZ.png` and 4x inspection image; expected case count changes from 5 to 6.
+- **RED/GREEN honesty:** new failing-before-fix behavior not reproduced in a real run; this is a new regression/acceptance test, not a proven bug fix. No new exact-head CI run, fresh ROM compile, or new screenshot result was verified at this checkpoint. Do not infer green from prior #44880819421.
+- **Next single action:** inspect the fresh workflow run triggered by build code `eab053a` (source SHA must match live `feature/zh-hant-tw-hk-1x`), fetch failed Cangjie job logs if red, fix source/test and rerun; then inspect `zh_tw_cangjie_invalid_ZZZZZ.png` and the run's `zh_tw_ci_handoff.json`.
+- **Still blocked:** practical full Cangjie corpus/runtime paging, Taiwan Zhuyin, save/reload and nickname, gameplay Traditional raster screenshots, 8x8 root legibility, IPS release validation. 1.0 untouched; no Nintendo ROM distributed.
+
+
 ## Verified checkpoint — 2026-11-21: FULL 速成 code corpus now in actual ROM (NOT final product)
 
 - **Exact successful CI:** [#44880819421](https://github.com/kevinchan0820/pokecrystal_cn_build/actions/runs/44880819421), **SUCCESS**, built from game source SHA `04a8387edb303fff9ac6170b6c1ec49ff4a9e5ae`, build code SHA `69f6b985ab3865c6e3fc410882e880373dd49bb7`; canonical `zh_tw_ci_handoff.json` confirms both and current IPS SHA256 `cc558e0c1dbd28c50c39d656a7b7834b68fb06412c053684d5e280def5b8a896`. This is **not a release approval**.
