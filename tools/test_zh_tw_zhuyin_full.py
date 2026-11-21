@@ -1,5 +1,6 @@
 """Tests for genuine Taiwan 注音 symbols + tones, no Pinyin shortcut."""
 import unittest
+from pathlib import Path
 from zh_tw_zhuyin_full import SYMBOLS,CODE,collect,emit_asm,emit_symbol_map
 
 class ZhuyinFullTests(unittest.TestCase):
@@ -37,6 +38,17 @@ class ZhuyinFullTests(unittest.TestCase):
         out,_=collect(rows,set("明阿"),lambda ch:ch)
         self.assertNotIn("ming2",out)
         self.assertEqual(out["ㄚ"],["阿"])
+
+    def test_tone_marks_cannot_begin_name_syllable(self):
+        # Failing PyBoy red: #44888474953 accepted a lone ˊ.
+        # A legitimate ㄇㄧㄥˊ must remain possible: only the initial
+        # symbol is restricted to 37 Bopomofo letters, not four tones.
+        src=(Path(__file__).resolve().parents[1]/
+             "pokecrystal_cn/engine/dfs/zhuyin_lookup.asm").read_text(
+                 encoding="utf-8")
+        dispatch=src.split("ZhuyinLookup::",1)[1].split("ld c, a",1)[0]
+        self.assertRegex(dispatch,r'(?s)sub "A"\\s+\n?\\s*jp c, \\.no_result')
+        self.assertRegex(dispatch,r'(?s)cp 37\\s+\n?\\s*jp nc, \\.no_result')
 
 if __name__=="__main__":
     unittest.main()
