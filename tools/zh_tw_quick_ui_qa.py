@@ -28,7 +28,7 @@ def run(rom, source, folder):
     gb.set_emulation_speed(0)
     names = ("wNamingScreenLetterCase", "wIMEPinyin", "wIMEMaxLine",
              "wIMEAddr", "wIMEBank", "wPlayerName", "wNamingScreenCurNameLength",
-             "wNamingScreenCursorObjectPointer", "wTilemap")
+             "wNamingScreenCursorObjectPointer", "wTilemap", "wAttrmap")
     addr = {name: gb.symbol_lookup(name) for name in names}
     entry = []
     gb.hook_register(None, "NamingScreen", lambda o: o.append(True), entry)
@@ -142,6 +142,23 @@ def run(rom, source, folder):
             if key_pixels(i) != expanded_root(i):
                 raise AssertionError(f"Quick key {chr(65+i)} is not the Rime root bitmap")
         quick_screen = gb.screen.image.copy()
+        snapshot("quick_radicals_raw")
+        attr_bank, attr_start = addr["wAttrmap"]
+        keyboard_attrs = [gb.memory[attr_bank, attr_start + row*20 + col]
+                          for row in (8,9) for col in (1,2,3,4,5,7,8,9,10,11)]
+        def vram_bytes(bank, key_index):
+            try:
+                return [gb.memory[bank, 0x8800+key_index*16+n] for n in range(16)]
+            except Exception as exc:
+                return [type(exc).__name__ + ": " + str(exc)]
+        result["root_display_diagnostics"] = {
+            "keyboard_tile_ids": [tile(8,x) for x in range(1,6)],
+            "keyboard_attributes": keyboard_attrs,
+            "attribute_bank1_count": sum((attr & 8) != 0 for attr in keyboard_attrs),
+            "letter_a_vram_bank0": vram_bytes(0,0),
+            "letter_a_vram_bank1": vram_bytes(1,0),
+            "root_a_expected": list(expanded_root(0)),
+        }
         # SELECT from Quick to Pinyin must restore the stock Latin alphabet.
         key("select", 35)
         if val("wNamingScreenLetterCase") != 0:
@@ -149,6 +166,9 @@ def run(rom, source, folder):
         if any(key_pixels(i) == expanded_root(i) for i in samples):
             raise AssertionError("Latin keyboard glyphs not restored after leaving Quick")
         latin_screen = gb.screen.image.copy()
+        snapshot("pinyin_latin_restored")
+        result["root_display_diagnostics"]["latin_letter_a_bank0"] = vram_bytes(0,0)
+        result["root_display_diagnostics"]["latin_letter_a_bank1"] = vram_bytes(1,0)
         if quick_screen.crop((8,64,152,80)).tobytes() == latin_screen.crop((8,64,152,80)).tobytes():
             raise AssertionError("Key display still looks identical in Latin and Cangjie modes")
         # Return to Quick: original keycodes and locations must remain intact.
