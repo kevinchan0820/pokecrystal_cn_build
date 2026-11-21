@@ -25,7 +25,7 @@ def run(rom: Path, output: Path) -> dict:
     if sym is None:
         raise AssertionError("Missing ROM symbol file containing SRAM and player name")
     keys = ("wPlayerName", "wPlayerData", "sPlayerData", "wSaveFileExists",
-            "wNamingScreenLetterCase", "wNamingScreenCurNameLength")
+            "wNamingScreenLetterCase", "wNamingScreenCurNameLength", "wMenuCursorY")
     evidence = {"verified": False, "scenarios": {}, "failures": [],
                 "scope": "Real player-name game SAVE and battery SRAM reboot (not Pokemon nicknames)"}
     rom_emulator = None
