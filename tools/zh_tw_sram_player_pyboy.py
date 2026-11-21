@@ -44,6 +44,9 @@ def run(rom: Path, output: Path) -> dict:
                                    lambda events: events.append(True), save_menu)
         rom_emulator.hook_register(None, "SavePlayerData",
                                    lambda events: events.append(True), saved_player)
+        yes_no_events = []
+        rom_emulator.hook_register(None, "SaveTheGame_yesorno",
+                                   lambda events: events.append(True), yes_no_events)
 
         def value(name, index=0):
             bank, offset = addr[name]
@@ -141,9 +144,6 @@ def run(rom: Path, output: Path) -> dict:
         # is visible: the routine may still be rendering text. Record a
         # controller-independent CPU checkpoint and the menu cursor so that
         # a failed CI distinguishes an unopened dialog from bad button input.
-        yes_no_events = []
-        rom_emulator.hook_register(None, "SaveTheGame_yesorno",
-                                   lambda events: events.append(True), yes_no_events)
         evidence["scenarios"]["save_prompt"]["diagnostic"] = {
             "cursor_y": value("wMenuCursorY") if "wMenuCursorY" in addr else None,
             "screen_before_search": snapshot("save_prompt_before_search"),
