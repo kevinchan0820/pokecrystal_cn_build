@@ -1,3 +1,9 @@
+## 2026-11-21 19:54 HKT — STARTED / live recovery checkpoint (NOT READY)
+
+- Execution: STARTED; identity: scheduled autonomous run (no unique external ID exposed). Live source HEAD `d2a1e79abd9c4a0edf59635d4a3b398eebdb3766`; live build HEAD before this checkpoint `d66600db37fb5ed623c04dee087b526d1f43a000`.
+- Latest actual code-head Actions [#44896809867](https://github.com/kevinchan0820/pokecrystal_cn_build/actions/runs/44896809867) for `434320739b1004908f19a9bd9e0decf2292c927c` completed **FAILURE**; subsequent Markdown-only commits do not automatically trigger CI. No exact-current-build PASS. Previous note is stale for this new CI.
+- First blocked release gate: genuine player name SAVE / SRAM / fresh CONTINUE; diagnose failure in `tools/zh_tw_sram_player_pyboy.py` using run jobs/logs/artifact; implement targeted regression and rerun. Pokémon nickname SRAM, Bag/Trainer Card/battle, glyph editorial and final IPS still not accepted.
+
 ## 2026-11-21 19:00 HKT — SRAM SAVE controller route investigation (NOT READY)
 
 - Live source HEAD `d2a1e79abd9c4a0edf59635d4a3b398eebdb3766`; build HEAD at investigation start `eff0a4b38e307d77db3eec05e45f4b810b1ae426`. Exact-head Actions [#44893881014](https://github.com/kevinchan0820/pokecrystal_cn_build/actions/runs/44893881014) **FAILURE**, step 17 `Verify real player name SAVE, battery SRAM and fresh CONTINUE`. Failure detail not retrievable from available job metadata; do not claim root cause proven. Earlier #44893530561 also failed.
