@@ -112,8 +112,24 @@ def run(rom: Path, output: Path) -> dict:
             raise AssertionError(
                 "START menu not reached after real introductory controller presses")
 
+        # The StartMenu CPU hook fires before its menu has finished drawing.
+        # Earlier CI captured a blank menu and selected the Trainer Card with
+        # down/down/A while mistaking an eventual SaveMenu hook for the route.
+        # Wait for real menu initialization, then assert the selected menu
+        # command is SAVE (enum 4), not merely that a hook fired.
+        rom_emulator.tick(120, render=True)
+        selection = rom_emulator.symbol_lookup("wMenuSelection")
+        if selection is None:
+            raise AssertionError("Missing wMenuSelection symbol for START menu")
+        def selected_command():
+            bank, offset = selection
+            return rom_emulator.memory[bank, offset]
+
         open_menu = capture_state()
-        evidence["scenarios"]["start_menu"] = {"screen": snapshot("start_menu")}
+        evidence["scenarios"]["start_menu"] = {
+            "screen": snapshot("start_menu"),
+            "initial_command": selected_command(),
+        }
         # Try down positions from the actual open START menu, checking the
         # CPU's SaveMenu hook. Search uses emulator snapshots only to
         # avoid having to replay the entire intro for every menu row.
@@ -123,6 +139,9 @@ def run(rom: Path, output: Path) -> dict:
             before = len(save_menu)
             for _ in range(down_count):
                 key("down", 20)
+            command_before_a = selected_command()
+            if command_before_a != 4:  # STARTMENUITEM_SAVE
+                continue
             key("a", 55)
             if len(save_menu) > before:
                 save_route = ["down"] * down_count + ["a"]
@@ -131,8 +150,14 @@ def run(rom: Path, output: Path) -> dict:
             raise AssertionError("Real START menu SAVE command unreachable using D-pad")
 
         restore_state(open_menu)
-        for button in save_route:
+        for button in save_route[:-1]:
             key(button, 55)
+        if selected_command() != 4:
+            raise AssertionError("SAVE route replay selected a different START menu command")
+        key("a", 55)
+        # SaveMenu hook occurs before the save question is ready for input.
+        # Do not begin route search while the prompt is still rendering.
+        rom_emulator.tick(120, render=True)
         evidence["scenarios"]["save_prompt"] = {
             "menu_route": save_route, "screen": snapshot("game_save_yes_no")}
         # Search *controller actions* on the actual game's yes/no screen.
