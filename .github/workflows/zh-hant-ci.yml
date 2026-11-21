@@ -1,12 +1,12 @@
-name: Traditional Chinese Crystal build
+name: 1.x Taiwan / Hong Kong character input build
 on:
   workflow_dispatch:
   push:
     branches:
-      - work/zh-hant-tw
+      - feature/zh-hant-tw-hk-1x
 
 concurrency:
-  group: zh-hant-build-work
+  group: zh-hant-1x-build-work
   cancel-in-progress: true
 
 permissions:
@@ -17,6 +17,8 @@ jobs:
     name: Generate zh-Hant text, fonts, and compile
     runs-on: ubuntu-24.04
     timeout-minutes: 45
+    env:
+      ZH_TW_SOURCE_BRANCH: feature/zh-hant-tw-hk-1x
     steps:
       - uses: actions/checkout@v4
         with:
@@ -49,7 +51,7 @@ jobs:
           git clone --depth 1 --branch v1.0.1 https://github.com/gbdev/rgbds.git clean_rgbds
           make -C clean_rgbds -j2
           make -C clean_crystal -j2 crystal11 RGBDS="$PWD/clean_rgbds/"
-          .venv/bin/python tools/zh_tw_ips.py clean_crystal/pokecrystal11.gbc build/pokecrystal11.gbc
+          .venv/bin/python tools/zh_tw_ips.py clean_crystal/pokecrystal11.gbc build/pokecrystal11.gbc --output Crystal_Traditional_Chinese_TWHK_1x.ips
       - name: Record ROM checksums (do not upload copyrighted ROM)
         if: success()
         run: find build -maxdepth 1 -name '*.gbc' -type f -exec sha256sum {} \; > zh_tw_rom_sha256.txt
@@ -57,7 +59,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: zh-hant-translated-text-and-build-reports
+          name: zh-hant-1x-twhk-input-prototype-and-reports
           path: |
             text.zh-TW.xlsx
             zh_tw_*_report.json
@@ -65,6 +67,6 @@ jobs:
             zh_tw_rom_sha256.txt
             zh_tw_*.png
             zh_tw_emulator_report.json
-            Crystal_Traditional_Chinese_v1.1.ips
+            Crystal_Traditional_Chinese_TWHK_1x.ips
             zh_tw_patch_manifest.json
           if-no-files-found: warn
