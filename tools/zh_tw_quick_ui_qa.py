@@ -130,6 +130,45 @@ def run(rom, source, folder):
         if any(tile(7, x) != empty_tile for x in range(1, 10)):
             raise AssertionError("Mode status spills into blank spacer row")
         stable_keys = keyboard()
+        # Rime-root labels MUST occupy precisely the old 8x8 A-Z cells.
+        # Compare bytes in actual PyBoy VRAM (not only source code).
+        source_roots = (source / "gfx/naming_screen/cangjie_roots.1bpp").read_bytes()
+        samples = (0, 1, 2, 21, 25)  # 日 月 金 女 符
+        def key_pixels(i):
+            return bytes(gb.memory[0, 0x8800 + i*16 + n] for n in range(16))
+        def expanded_root(i):
+            return bytes(v for row in source_roots[i*8:i*8+8] for v in (row, row))
+        for i in samples:
+            if key_pixels(i) != expanded_root(i):
+                raise AssertionError(f"Quick key {chr(65+i)} is not the Rime root bitmap")
+        quick_screen = gb.screen.image.copy()
+        # SELECT from Quick to Pinyin must restore the stock Latin alphabet.
+        key("select", 35)
+        if val("wNamingScreenLetterCase") != 0:
+            raise AssertionError("Quick -> Pinyin mode transition failed")
+        if any(key_pixels(i) == expanded_root(i) for i in samples):
+            raise AssertionError("Latin keyboard glyphs not restored after leaving Quick")
+        latin_screen = gb.screen.image.copy()
+        if quick_screen.crop((8,64,152,80)).tobytes() == latin_screen.crop((8,64,152,80)).tobytes():
+            raise AssertionError("Key display still looks identical in Latin and Cangjie modes")
+        # Return to Quick: original keycodes and locations must remain intact.
+        for _ in range(4):
+            key("select", 35)
+        if val("wNamingScreenLetterCase") != 4:
+            raise AssertionError("Could not switch back to Quick")
+        for i in samples:
+            if key_pixels(i) != expanded_root(i):
+                raise AssertionError("Cangjie glyphs not restored on entering Quick again")
+        if keyboard() != stable_keys:
+            raise AssertionError("Keyboard tile IDs changed; Quick lookup code would be corrupted")
+        result["root_keyboard_qa"] = {
+            "rime_reference": "rime/rime-cangjie cangjie5_express.schema.yaml",
+            "checked_roots": ["日", "月", "金", "女", "符"],
+            "glyph_size_px": [8, 8],
+            "quick_to_pinyin_restoration": True,
+            "original_letter_keycodes_preserved": True,
+            "quick_screenshot": snapshot("quick_radical_keyboard")
+        }
         baseline = state()
         # Read the *same input encoding used by the assembled dictionary*.
         table_bank, table_addr = gb.symbol_lookup("QuickTB")
