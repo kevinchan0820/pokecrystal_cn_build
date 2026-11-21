@@ -28,7 +28,8 @@ def run(rom, source, folder):
     gb = PyBoy(str(rom), symbols=str(sym), window="null", sound_emulated=False)
     gb.set_emulation_speed(0)
     names = ("wNamingScreenLetterCase", "wIMEPinyin", "wIMEMaxLine",
-             "wIMELine", "wIMEAddr", "wIMEBank", "wPlayerName", "wNamingScreenCurNameLength",
+             "wIMELine", "wIMEAddr", "wIMEBank", "wIMEFullCandidateCount",
+             "wPlayerName", "wNamingScreenCurNameLength",
              "wNamingScreenCursorObjectPointer", "wTilemap", "wAttrmap")
     addr = {name: gb.symbol_lookup(name) for name in names}
     entry = []
