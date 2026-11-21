@@ -24,6 +24,15 @@ class NamingJoypadDispatchTest(unittest.TestCase):
                         + re.escape(target) + r"\b")
                 self.assertRegex(dispatch, expr)
         self.assertNotRegex(dispatch, r"(?m)^\s*jr\s+nz,\s*\.(?:a|b|start|select)\b")
+        # A-button destinations now span more than +/-127 bytes too.
+        a_handler = source.split("\n.a\n", 1)[1].split("\n.start\n", 1)[0]
+        for condition, target in (("z", ".select"), ("z", ".b"),
+                                  ("z", ".end"), ("c", ".start_normal")):
+            with self.subTest(a_target=target):
+                self.assertRegex(a_handler,
+                    r"(?m)^\s*jp\s+" + condition + r",\s*" +
+                    re.escape(target) + r"\b")
+        self.assertNotRegex(a_handler, r"(?m)^\s*jr\s+[cz],\s*\.(?:select|b|end|start_normal)\b")
 
 
 if __name__ == "__main__":
