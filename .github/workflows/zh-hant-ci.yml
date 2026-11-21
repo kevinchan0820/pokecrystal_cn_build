@@ -48,6 +48,11 @@ jobs:
         if: success()
         run: |
           .venv/bin/python tools/zh_tw_ui_capture.py build/pokecrystal11.gbc --output .
+      - name: Probe actual 1.x naming entry and switch controls in PyBoy
+        if: success()
+        run: |
+          find build -maxdepth 1 -name '*.sym' -print
+          .venv/bin/python tools/zh_tw_naming_probe.py build/pokecrystal11.gbc --output .
       - name: Build verified clean Crystal and generate a patch
         if: success()
         run: |
