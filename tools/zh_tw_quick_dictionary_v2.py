@@ -75,6 +75,16 @@ def build_buckets(source: str, supported: set[str], convert=lambda ch: ch):
         buckets[quick].append(char)
     if not buckets:
         raise ValueError("No supported dictionary entries")
+    # Preserve existing tested first-choice behavior in the full IME, rather
+    # than silently turning previously playable AA->晶 into AA->昌.
+    # Each option is still sourced from the pinned upstream MIT dictionary.
+    preferred = {"a": ("日", "曰"), "aa": ("晶",), "ab": ("明",), "vd": ("好",)}
+    for quick, chars in buckets.items():
+        first = preferred.get(quick, ())
+        for char in reversed(first):
+            if char in chars:
+                chars.remove(char)
+                chars.insert(0, char)
     bad = {code: len(chars) for code, chars in buckets.items()
            if len(chars) > MAX_QUICK_CANDIDATES}
     if bad:
