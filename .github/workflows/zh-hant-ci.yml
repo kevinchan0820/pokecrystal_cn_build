@@ -34,6 +34,14 @@ jobs:
           python3 -m venv .venv
           .venv/bin/python -m pip install --upgrade pip
           .venv/bin/python -m pip install openpyxl opencc-python-reimplemented Pillow pyboy
+      # All unit tests must examine the LIVE 1.x source HEAD, not the
+      # pinned legacy submodule! Otherwise source-level regressions report
+      # false RED/GREEN against an outdated checkout.
+      - name: Checkout current 1.x game source before regression tests
+        run: |
+          git -C pokecrystal_cn fetch origin "$ZH_TW_SOURCE_BRANCH"
+          git -C pokecrystal_cn checkout --detach FETCH_HEAD
+          echo "Testing game-source SHA $(git -C pokecrystal_cn rev-parse HEAD)"
       - name: Syntax check all Python helpers
         run: .venv/bin/python -m compileall -q tools
       - name: Verify menu localization parser regressions
