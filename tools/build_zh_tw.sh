@@ -40,6 +40,17 @@ python3 tools/zh_tw_locale.py \
   --workbook text.zh-TW.xlsx \
   --rules data/zh_tw_locale.json \
   --report zh_tw_locale_report.json
+# A complete audit: every game dialogue entry and every recognized ASM string.
+# Do this BEFORE font generation; newly added Han characters will be allocated
+# by zh_tw_font.py after the wording and references are finalized.
+python3 tools/zh_tw_complete_text_audit.py \
+  --source pokecrystal_cn \
+  --workbook text.zh-TW.xlsx \
+  --report zh_tw_complete_text_audit_report.json \
+  --strict
+python3 tools/zh_tw_ui_gates.py \
+  --source pokecrystal_cn \
+  --report zh_tw_ui_terminology_report.json
 # Verify the canonical Taiwanese battle message identities before compiling.
 python3 tools/zh_tw_battle_audit.py \
   --workbook text.zh-TW.xlsx \
