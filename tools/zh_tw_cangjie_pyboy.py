@@ -153,6 +153,7 @@ def test(rom:Path, source:Path, output:Path)->dict:
         # Cangjie index, display stale candidates, write a name, or trap B.
         # All inputs are real controller keypresses, not WRAM injection.
         restore(original)
+        original_name_bytes=[val("wPlayerName",i) for i in range(3)]
         invalid_routes=[]
         for i in range(5):
             route,typed=type_letter(state(),0x99,i)
@@ -160,7 +161,7 @@ def test(rom:Path, source:Path, output:Path)->dict:
             invalid_routes.append(route)
         if val("wIMEFullCandidateCount")!=0 or val("wIMEMaxLine")!=0:
             raise AssertionError("Cangjie ZZZZZ produced phantom candidates")
-        if val("wNamingScreenCurNameLength")!=0 or val("wPlayerName")!=0x50:
+        if val("wNamingScreenCurNameLength")!=0 or [val("wPlayerName",i) for i in range(3)]!=original_name_bytes:
             raise AssertionError("Cangjie ZZZZZ corrupted player name")
         invalid_screen=frame("invalid_ZZZZZ")
         button("b",35)
