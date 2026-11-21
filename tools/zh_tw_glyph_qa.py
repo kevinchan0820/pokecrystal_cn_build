@@ -13,7 +13,7 @@ from pathlib import Path
 from PIL import Image, ImageFont
 from zh_tw_font import render
 
-SAMPLES = "好你的名字速成碼晶明"
+SAMPLES = "好你的名字速成碼晶明敵人灼傷害火岩鼠"
 CHARMAP = re.compile(r'^\s*charmap_w\s+"([^"]+)"\s*,\s*\$([0-9A-Fa-f]{1,2})\s*,\s*\$([0-9A-Fa-f]{1,2})', re.M)
 
 
