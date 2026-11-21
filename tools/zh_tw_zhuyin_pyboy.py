@@ -145,34 +145,46 @@ def run(rom:Path,source:Path,output:Path):
                 cases["real_12px_tone_preview"]={"screen":typed_screen,"symbols":spelling}
             base=state()
             expected_bytes=char_code(source/"constants/charmap_cn.asm",expected)
-            # Candidate row0 starts with preferred 明 or 阿; find it
-            # through genuine 8-bit controller navigation.
-            directions=[
-                ("down","down"),("down","down","right"),
-                ("down","down","right","right"),
-                ("down","down","left"),("down","down","left","left"),
-                ("down","down","right","right","right"),
-                ("down","down","right","right","right","right")]
+            # A phonetic symbol may be on any of 41 key positions. The
+            # selected key's X coordinate is NOT guaranteed to align with
+            # the first candidate. Explore the actual GBC D-pad navigation
+            # graph rather than assuming DOWN,DOWN always hits candidate0.
+            # Never press A on keyboard rows: that would change the code.
+            frontier=deque([(base,[])])
+            visited=set()
             found=False
-            for path in directions:
-                restore(base)
-                for d in path:key(d,16)
-                key("a",45)
-                if val("wNamingScreenCurNameLength")==2 and [
-                        val("wPlayerName"),val("wPlayerName",1)]==expected_bytes:
-                    if val("wPlayerName",2)!=0x50:
-                        raise AssertionError("Zhuyin name terminator corrupted")
-                    cases[spelling]={
-                        "name":expected,"actual_code":spelling,
-                        "bytes":expected_bytes,"input_routes":routes,
-                        "selection_route":list(path),
-                        "selected_png":snap("committed_"+str(len(spelling))),
-                        "typed_png":typed_screen,
-                    }
-                    found=True
-                    break
+            while frontier and len(visited)<160:
+                candidate_state,path=frontier.popleft()
+                restore(candidate_state)
+                xy=pos()
+                if xy in visited:
+                    continue
+                visited.add(xy)
+                if xy[1] in (2,3):
+                    key("a",35)
+                    if val("wNamingScreenCurNameLength")==2 and [
+                            val("wPlayerName"),val("wPlayerName",1)]==expected_bytes:
+                        if val("wPlayerName",2)!=0x50:
+                            raise AssertionError("Zhuyin name terminator corrupted")
+                        cases[spelling]={
+                            "name":expected,"actual_code":spelling,
+                            "bytes":expected_bytes,"input_routes":routes,
+                            "selection_route":list(path),
+                            "selected_png":snap("committed_"+str(len(spelling))),
+                            "typed_png":typed_screen,
+                        }
+                        found=True
+                        break
+                for direction in ("left","right","down","up"):
+                    restore(candidate_state)
+                    key(direction,12)
+                    nxt=pos()
+                    if nxt[1]<=3 and nxt not in visited:
+                        frontier.append((state(),path+[direction]))
             if not found:
-                raise AssertionError("Zhuyin "+spelling+" candidate exists but cannot commit "+expected)
+                raise AssertionError(
+                    "Zhuyin "+spelling+" code has candidates but cannot commit "+
+                    expected+"; visited cursor positions="+str(sorted(visited)))
         restore(initial)
         key("select",35)
         if val("wNamingScreenLetterCase")!=0:
