@@ -168,9 +168,24 @@ def run(rom, source, folder):
                     {"key": chr(65+index), "wrong_pixels": different})
         result["second_row_screen_pixel_audit"] = second_row_visual_errors
         if second_row_visual_errors:
+            # Identify exactly why the display remains Latin: tilemap codes,
+            # CGB attribute bank, raw VRAM tile data, or delayed VRAM update.
+            attr_bank0, attr_start0 = addr["wAttrmap"]
+            diagnostics = []
+            for index, xcol in ((16, 1), (17, 2), (21, 7), (25, 11)):
+                tid = tile(9, xcol)
+                attr = gb.memory[attr_bank0, attr_start0 + 9*20 + xcol]
+                address = 0x8800 + (tid - 0x80)*16
+                diagnostics.append({
+                    "key": chr(65+index), "tile_id": tid, "attribute": attr,
+                    "vram0": [gb.memory[0,address+n] for n in range(16)],
+                    "vram1": [gb.memory[1,address+n] for n in range(16)],
+                    "expected": list(expanded_root(index)),
+                })
+            result["second_row_vram_diagnostics"] = diagnostics
             raise AssertionError(
-                f"Quick Q-Z still visually Latin despite VRAM test: "
-                f"{second_row_visual_errors}")
+                f"Quick Q-Z rendered Latin: {second_row_visual_errors}. "
+                f"Hardware diagnostics: {diagnostics}")
         attr_bank, attr_start = addr["wAttrmap"]
         keyboard_attrs = [gb.memory[attr_bank, attr_start + row*20 + col]
                           for row in (8,9) for col in (1,2,3,4,5,7,8,9,10,11)]
