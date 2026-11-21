@@ -88,8 +88,8 @@ def run(rom: Path, source: Path, folder: Path, strict: bool):
             raise AssertionError("SELECT×4 did not enter Quick mode")
         quick_blank = snapshot("quick_blank")
         baseline = save_state()
-        for code, label, han, move in (("AA", "QuickCandidatesAA", "晶", ()),
-                                        ("AB", "QuickCandidatesAB", "明", ("right",))):
+        for code, label, han, move in (("AA", "QuickV2_AA", "晶", ()),
+                                        ("AB", "QuickV2_AB", "明", ("right",))):
             case = {"code": code, "target": han, "initial": quick_blank}
             scenarios[code] = case
             try:
@@ -145,7 +145,7 @@ def run(rom: Path, source: Path, folder: Path, strict: bool):
             "source_symbol_file": sym.name,
             "tested": scenarios,
             "failures": failures,
-            "warning": "Only initial 4-code limited Quick dictionary; not full Quick/Cangjie.",
+            "warning": "Full MIT Quick dictionary integrated; full Cangjie/Zhuyin and save/reload still pending.",
         }
         (folder / "zh_tw_quick_pyboy_report.json").write_text(
             json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
