@@ -58,6 +58,94 @@
       "to": "訓練家/?????",
       "reason": "Trade egg detail also uses Original Trainer label; same display-width constraint.",
       "source_url": "https://wiki.52poke.com/zh-hant/初訓家"
+    },
+    {
+      "id": "options-text-speed",
+      "path": "engine/menus/options_menu.asm",
+      "from": "語速",
+      "to": "文字速度",
+      "reason": "Text Speed setting; Taiwan natural UI label",
+      "source_url": "https://wiki.52poke.com/zh-hant/設置"
+    },
+    {
+      "id": "options-battle-animation",
+      "path": "engine/menus/options_menu.asm",
+      "from": "對戰動畫",
+      "to": "戰鬥動畫",
+      "reason": "Controls playback of in-battle graphical move animations",
+      "source_url": "https://wiki.52poke.com/zh-hant/設置"
+    },
+    {
+      "id": "options-battle-style",
+      "path": "engine/menus/options_menu.asm",
+      "from": "比賽規則",
+      "to": "對戰規則",
+      "reason": "Battle Style is Shift/Set, not tournament rules",
+      "source_url": "https://wiki.52poke.com/zh-hant/設置"
+    },
+    {
+      "id": "options-frame-style",
+      "path": "engine/menus/options_menu.asm",
+      "from": "邊框       類型",
+      "to": "邊框樣式",
+      "reason": "Frame choice already rendered as 1–8 in the options screen",
+      "source_url": "https://en.wikibooks.org/wiki/Pok%C3%A9mon_Crystal/Options"
+    },
+    {
+      "id": "options-battle-anim-on",
+      "path": "engine/menus/options_menu.asm",
+      "from": "看　@",
+      "to": "開啟@",
+      "reason": "Animation ON versus OFF, not look/do not look",
+      "source_url": "https://wiki.52poke.com/zh-hant/設置"
+    },
+    {
+      "id": "options-battle-anim-off",
+      "path": "engine/menus/options_menu.asm",
+      "from": "不看@",
+      "to": "關閉@",
+      "reason": "Animation ON versus OFF, not look/do not look",
+      "source_url": "https://wiki.52poke.com/zh-hant/設置"
+    },
+    {
+      "id": "start-menu-save-description-1",
+      "path": "engine/menus/start_menu.asm",
+      "from": "在休息之前",
+      "to": "儲存目前的",
+      "reason": "Save can be performed any time; don't imply sleep",
+      "source_url": "https://en.wikibooks.org/wiki/Pok%C3%A9mon_Crystal"
+    },
+    {
+      "id": "start-menu-save-description-2",
+      "path": "engine/menus/start_menu.asm",
+      "from": "先記錄狀態@",
+      "to": "冒險進度@",
+      "reason": "Save persists adventure progress",
+      "source_url": "https://en.wikibooks.org/wiki/Pok%C3%A9mon_Crystal"
+    },
+    {
+      "id": "start-menu-options-description-1",
+      "path": "engine/menus/start_menu.asm",
+      "from": "對規則等等",
+      "to": "調整遊戲設定",
+      "reason": "Describe actual options without awkward wording",
+      "source_url": "https://en.wikibooks.org/wiki/Pok%C3%A9mon_Crystal/Options"
+    },
+    {
+      "id": "start-menu-options-description-2",
+      "path": "engine/menus/start_menu.asm",
+      "from": "進行調整@",
+      "to": "與操作選項@",
+      "reason": "Second line completes option description",
+      "source_url": "https://en.wikibooks.org/wiki/Pok%C3%A9mon_Crystal/Options"
+    },
+    {
+      "id": "main-menu-options",
+      "path": "engine/menus/main_menu.asm",
+      "from": "重新設置@",
+      "to": "設定@",
+      "reason": "This entry opens options, not a reset",
+      "source_url": "https://github.com/pret/pokecrystal/blob/master/engine/menus/main_menu.asm"
     }
   ],
   "editorial_review": [
@@ -100,7 +188,15 @@
     "效果拔群",
     "好像效果不好",
     "甭",
-    "啥"
+    "啥",
+    "邊框       類型",
+    "重新設置",
+    "比賽規則",
+    "對戰動畫",
+    "语速",
+    "边框",
+    "类型",
+    "設置"
   ],
   "workbook_phrase_rules": [
     {
