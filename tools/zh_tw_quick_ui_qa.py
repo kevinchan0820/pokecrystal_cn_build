@@ -223,8 +223,17 @@ def run(rom, source, folder):
             raise AssertionError("Cangjie mode unexpectedly restored Latin key tiles")
         bank, tstart = addr["wTilemap"]
         label = [gb.memory[bank, tstart + 6*20 + col] for col in range(1,4)]
-        if label != [0x7d, 0x7e, 0x7f]:
-            raise AssertionError(f"Cangjie mode heading must be 倉頡, got {label}")
+        if label != [0x6e, 0x6f, 0x70]:
+            raise AssertionError(f"Cangjie mode must reuse safe label tile slot: {label}")
+        # Regress bug #GBC-BLANK-7F: the sixth title originally overwrote
+        # tile $7f used as blank background, corrupting entire screen.
+        # This region is always blank on the initial name entry screen.
+        sample = gb.screen.image.convert("RGB").crop((100, 8, 145, 18))
+        ink = sum(1 for pixel in sample.getdata() if sum(pixel) < 420)
+        result["cangjie_blank_panel_ink"] = ink
+        if ink > 3:
+            raise AssertionError(
+                f"GBC $7f blank tile overwritten: {ink} garbage pixels in empty name panel")
         key("select", 35)
         if val("wNamingScreenLetterCase") != 0:
             raise AssertionError("Cangjie -> Pinyin mode transition failed")
