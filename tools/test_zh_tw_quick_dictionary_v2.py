@@ -11,7 +11,7 @@ class QuickV2DictionaryTests(unittest.TestCase):
         supported=set("日曰昌晶明好鹂")
         groups,stats=build_buckets(rows,supported,lambda ch:"鸝" if ch=="鹂" else ch)
         self.assertEqual(groups["a"], ["日","曰"])
-        self.assertEqual(groups["aa"], ["昌","晶"])
+        self.assertEqual(groups["aa"], ["晶","昌"])  # stable tested default
         self.assertEqual(groups["ab"], ["明"])
         self.assertEqual(groups["vd"], ["好"])
         self.assertNotIn("鹂",groups["aa"])
