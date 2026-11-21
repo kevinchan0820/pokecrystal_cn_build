@@ -1,5 +1,15 @@
 # Crystal 1.x — durable execution state
 
+## Verified checkpoint — 2026-11-21: ALL 26 Cangjie root keys now visible in actual PyBoy
+
+- **Latest exact-head success:** [GitHub Actions #44873879766](https://github.com/kevinchan0820/pokecrystal_cn_build/actions/runs/44873879766) **SUCCESS**, source `525f6728ec3d04ede5517fe079a462db72670aab`, build code `8ef9e14b5f88640d83e26ce6d1bb8d4d56d12d4f`. Passed full ROM/IPS creation, boot, options, five naming modes, Quick AA→晶 / AB→明 / VD→好, Trainer Card approved 目前狀態 bitmap, five canonical battle strings.
+- **Critical false-green corrected:** earlier `zh_tw_quick_ui_quick_radical_keyboard.png` showed first row A-P as Han roots but Q-Z still Latin even though VRAM probes passed. Red screenshot test compared **actual 8x8 screen pixels** to atlas entries for keys Q-Z: all ten FAILED (19–33 differing pixels each). Do not trust VRAM-only glyph checks for UI.
+- **Actual root cause:** naming keyboard's second row is **screen tile row 10**, not row 9 (blank spacer). Previous test read row 9 and assumed Q-Z used bank0. The runtime uploaded only first **16** A-P Han glyphs to VRAM bank1. Fix in `engine/menus/naming_screen.asm`: upload **all 26** Cangjie glyphs to both bank0 and bank1 at original A-Z tile codes and 8x8 positions. New CI checks actual screenshot Q-Z pixels, and `zh_tw_quick_ui_report.json` states `passed:true`, `second_row_screen_pixel_audit:[]`. Success also preserved Latin Pinyin mode and real Quick entry.
+- **Superseded failed attempts:** [#44873264198](https://github.com/kevinchan0820/pokecrystal_cn_build/actions/runs/44873264198) and [#44873583610](https://github.com/kevinchan0820/pokecrystal_cn_build/actions/runs/44873583610) confirmed the failure. Simply forcing VBK=0 was insufficient; fix required full 26-tile bank1 copy, plus correcting the test's on-screen tile-row mapping.
+- **Source screenshot evidence:** CI artifact `zh_tw_quick_ui_quick_radical_keyboard.png`; same run has `zh_tw_quick_ui_name_HAO.png`. The image is a real 160×144 PyBoy frame, not a mockup.
+- **Current blockers unchanged:** legibility of complex 8x8 roots needs human UX review; Quick only tiny test dictionary and full Cangjie/注音 not implemented; actual battle status and Trainer Card page screenshots, save/load, `gfx/new_game/name_chinese.png` and full-game visual sweep not completed. **1.x not ready for release**. 1.0 untouched.
+- **Next action:** use PyBoy to reach Trainer Card, Bag and burned battle and inspect visible Taiwan glyphs. Keep strict Q-Z pixel test permanently, improve 8px root readability without changing key dimensions, then implement practical Quick dictionary with paging and real Zhuyin.
+
 ## Checkpoint — 2026-11-21 13:55+08:00 — real PyBoy screenshot zoom evidence
 
 - Read current EXECUTION_STATE, SUPERPOWERS_EXECUTION, TRUE_IME_ACCEPTANCE, and .agents/skills/crystal-end-to-end-localization/SKILL.md. Reviewed actual naming PyBoy QA implementation and prior CI artifact #44872657612. The previously green run predates this commit and MUST NOT be counted as exact-head validation.
