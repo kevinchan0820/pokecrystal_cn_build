@@ -27,6 +27,8 @@ SOURCE_BRANCH="${ZH_TW_SOURCE_BRANCH:-feature/zh-hant-tw-hk-1x}"
 git -C pokecrystal_cn fetch origin "$SOURCE_BRANCH"
 git -C pokecrystal_cn checkout --detach FETCH_HEAD
 echo "Using 1.x source: $SOURCE_BRANCH ($(git -C pokecrystal_cn rev-parse --short HEAD))"
+# Pin the exact source commit in every CI artifact for reproducible QA.
+git -C pokecrystal_cn rev-parse HEAD > zh_tw_source_commit.txt
 # Fail before building if the original Simplified title graphic is still present.
 python3 tools/zh_tw_title_check.py
 # Screen labels are bitmap glyphs (not OpenCC text), so verify the
