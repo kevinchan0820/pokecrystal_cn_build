@@ -112,16 +112,28 @@ def run(rom, source, folder):
             raise AssertionError("Quick mode wasn't selected")
 
         result["initial_image"] = snapshot("quick_initial")
-        # Chinese is 12px tall. The old PlaceString label produced only
-        # an 8px chopped upper half, leaving the lower tile row blank.
-        pixels = gb.screen.image.convert("RGB")
-        second_row_ink = sum(
-            1 for y in range(56, 64) for x in range(10, 64)
-            if sum(pixels.getpixel((x, y))) < 300)
-        result["status_label_lower_half_ink_pixels"] = second_row_ink
-        if second_row_ink < 8:
-            raise AssertionError(
-                f"Quick status label still clipped/missing lower Chinese strokes ({second_row_ink} pixels)")
+        # Verify the five letter QUICK header against the very same
+        # native 8x8 alphabet tiles used by the keyboard. In the old build
+        # the half-rendered Chinese header looked like corrupted text.
+        bank, start = addr["wTilemap"]
+        tile = lambda row, col: gb.memory[bank, start + row*20 + col]
+        expected_label_tiles = [
+            tile(9, 1),  # Q
+            tile(9, 5),  # U
+            tile(8, 10), # I
+            tile(8, 3),  # C
+            tile(8, 13), # K
+        ]
+        actual_label_tiles = [tile(6, col) for col in range(1, 6)]
+        result["quick_label_tiles"] = {
+            "actual": actual_label_tiles, "expected": expected_label_tiles}
+        if actual_label_tiles != expected_label_tiles:
+            raise AssertionError("Mode status is not readable native QUICK label")
+        # The following tile row must remain blank, not a damaged lower
+        # half or text spilling into the keyboard.
+        empty_tile = tile(7, 12)
+        if any(tile(7, x) != empty_tile for x in range(1, 10)):
+            raise AssertionError("Mode status spills into blank spacer row")
         stable_keys = keyboard()
         baseline = state()
         # Read the *same input encoding used by the assembled dictionary*.
