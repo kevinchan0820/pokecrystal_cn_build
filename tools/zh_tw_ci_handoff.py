@@ -14,6 +14,7 @@ REQUIRED = {
     "trainer_card_raster": ("zh_tw_trainer_card_raster_report.json", "verified"),
     "naming_action_and_mode_rasters": ("zh_tw_toolbar_bitmap_audit_report.json", "verified"),
     "bag_sprite_raster": ("zh_tw_pack_pocket_audit_report.json", "verified"),
+    "inline_player_names_traditional": ("zh_tw_player_names_report.json", "verified"),
     "mechanical_text_audit": ("zh_tw_complete_text_audit_report.json", "passes_mechanical_translation"),
     "battle_source_text": ("zh_tw_battle_audit_report.json", "verified"),
 }
