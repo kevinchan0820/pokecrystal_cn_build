@@ -9,12 +9,16 @@ from opencc import OpenCC
 
 QUOTED = re.compile(r'"((?:[^"\\]|\\.)*)"')
 SKIP = {"constants/charmap_cn.asm", "constants/charmap.asm", "macros/charmap_w.asm"}
-TEXT_DIRECTIVES = ("db_w", "li", "text", "line", "cont", "next", "para", "db")
-# Source text often has a label and a text directive on the SAME line:
+TEXT_DIRECTIVES = ("db_w", "li", "text", "line", "cont", "next", "para", "db",
+                   "npctrade", "getchar_w")
+# A display string may follow a conventional label WITH or WITHOUT a colon:
 #   .PokedexString: db_w "图鉴@"
-# The old first-token-only check saw ".PokedexString:" and silently missed it.
+#   .health  db_w "体力@"
+# Other user-visible strings occur as macro arguments:
+#   npctrade ..., "直树", ...
+#   getchar_w "宝"
 DISPLAY_LINE = re.compile(
-    r"^\s*(?:(?:[A-Za-z_.][A-Za-z0-9_.$@]*)(?:::|:)\s*)?"
+    r"^\s*(?:(?:[A-Za-z_.][A-Za-z0-9_.$@]*)(?:::|:)?\s+)?"
     r"(?:" + "|".join(TEXT_DIRECTIVES) + r")(?=\s|$)"
 )
 
