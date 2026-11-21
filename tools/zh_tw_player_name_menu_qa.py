@@ -9,11 +9,11 @@ import json
 import re
 from pathlib import Path
 
-EXPECTED = {"自己決定": 2, "小陽": 1, "克麗絲": 1}
-FORBIDDEN = ("自己决定", "小阳", "克丽丝")
+EXPECTED = {"自己決定": 2, "小陽": 1, "克麗絲": 1, "千瑤": 1}
+FORBIDDEN = ("自己决定", "小阳", "克丽丝", "千瑶")
 
 def audit(text):
-    values = re.findall(r'(?m)^\s*db_w\s+"([^"]+)"', text)
+    values = [v.removesuffix("@") for v in re.findall(r'(?m)^\s*db_w\s+"([^"]+)"', text)]
     failures = []
     for bad in FORBIDDEN:
         if bad in text:
