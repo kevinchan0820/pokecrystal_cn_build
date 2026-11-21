@@ -149,6 +149,29 @@ def test(rom:Path, source:Path, output:Path)->dict:
                     matched=True;break
             if not matched:
                 raise AssertionError("%s candidate %s exists but cannot select on GBC"%(code,character))
+        # Regression: an absent five-root code must not walk past the
+        # Cangjie index, display stale candidates, write a name, or trap B.
+        # All inputs are real controller keypresses, not WRAM injection.
+        restore(original)
+        invalid_routes=[]
+        for i in range(5):
+            route,typed=type_letter(state(),0x99,i)
+            restore(typed)
+            invalid_routes.append(route)
+        if val("wIMEFullCandidateCount")!=0 or val("wIMEMaxLine")!=0:
+            raise AssertionError("Cangjie ZZZZZ produced phantom candidates")
+        if val("wNamingScreenCurNameLength")!=0 or val("wPlayerName")!=0x50:
+            raise AssertionError("Cangjie ZZZZZ corrupted player name")
+        invalid_screen=frame("invalid_ZZZZZ")
+        button("b",35)
+        if val("wIMEPinyin",4)!=0x50:
+            raise AssertionError("B did not erase final invalid Cangjie root")
+        if val("wNamingScreenCurNameLength")!=0:
+            raise AssertionError("B on invalid Cangjie modified player name")
+        cases["invalid_code_and_backspace"]={
+            "code":"ZZZZZ","routes":invalid_routes,
+            "screen":invalid_screen,"no_phantom_candidates":True,
+            "b_deleted_fifth_root":True}
         restore(original)
         button("select",35)
         if val("wNamingScreenLetterCase")!=0:
@@ -159,7 +182,7 @@ def test(rom:Path, source:Path, output:Path)->dict:
         failures.append(type(exc).__name__+": "+str(exc))
     finally:
         gb.stop(save=False)
-        result={"passed":not failures and len(cases)==5,
+        result={"passed":not failures and len(cases)==6,
                 "test":"real full Cangjie5 VND/AAA/AB code-to-candidate-to-player-name",
                 "cases":cases,"failures":failures}
         (output/"zh_tw_cangjie_runtime_report.json").write_text(
