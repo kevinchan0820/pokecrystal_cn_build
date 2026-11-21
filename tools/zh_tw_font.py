@@ -18,10 +18,15 @@ from PIL import Image, ImageDraw, ImageFont
 CODES = re.compile(r'^\s*charmap_w\s+"([^"]+)"\s*,\s*\$([0-9A-Fa-f]{2})\s*,\s*\$([0-9A-Fa-f]{2})', re.M)
 QUOTES = re.compile(r'"((?:[^"\\]|\\.)*)"')
 EXCLUDED = {"constants/charmap.asm", "constants/charmap_cn.asm", "macros/charmap_w.asm"}
+# Taiwan Zhuyin symbols and four explicit tone marks need the same full
+# 12x12 DFS renderer as Han characters, not Latin placeholders.
+ZHUYIN_GLYPHS = "ㄅㄆㄇㄈㄉㄊㄋㄌㄍㄎㄏㄐㄑㄒㄓㄔㄕㄖㄗㄘㄙㄧㄨㄩㄚㄛㄜㄝㄞㄟㄠㄡㄢㄣㄤㄥㄦˊˇˋ˙"
 
 
 def han(ch):
-    return len(ch) == 1 and ("\u3400" <= ch <= "\u9fff" or "\uf900" <= ch <= "\ufaff")
+    return len(ch) == 1 and (
+        "\u3400" <= ch <= "\u9fff" or "\uf900" <= ch <= "\ufaff"
+        or ch in ZHUYIN_GLYPHS)
 
 
 def usage(source, workbook, extra_text=None):
@@ -100,6 +105,7 @@ def build(root, workbook, fontname, report, pointsize, extra_text=None):
     existing = {ch: (hi, lo) for ch, hi, lo in codepoints if len(ch) == 1}
     all_needed = usage(root, workbook, extra_text)
     required = {char for char in all_needed if han(char)}
+    required.update(ZHUYIN_GLYPHS)
     converter = OpenCC("s2t")
     predecessor = {}
     for char, hi, lo in codepoints:
