@@ -84,6 +84,10 @@ jobs:
         if: success()
         run: .venv/bin/python tools/zh_tw_zhuyin_pyboy.py build/pokecrystal11.gbc --source pokecrystal_cn --output .
 
+      - name: Verify real player name SAVE, battery SRAM and fresh CONTINUE
+        if: success()
+        run: .venv/bin/python tools/zh_tw_sram_player_pyboy.py build/pokecrystal11.gbc --output . --strict
+
       - name: Build verified clean Crystal and generate a patch
         if: success()
         run: |
