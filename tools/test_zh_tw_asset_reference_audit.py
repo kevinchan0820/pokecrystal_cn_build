@@ -27,6 +27,16 @@ class AssetReferenceAuditTests(unittest.TestCase):
             self.assertTrue(items["gfx/new_game/name_chinese.png"]["source_file_exists"])
             self.assertEqual(len(items["gfx/trainer_card/card_status.png"]["direct_source_references"]), 1)
 
+    def test_inline_asm_comment_is_not_a_reference(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            (root / "gfx.asm").write_text(
+                'db $00 ; INCBIN "gfx/new_game/name_chinese.2bpp"\\n',
+                encoding="utf-8")
+            res = scan(root)
+            self.assertEqual(
+                res["assets"]["gfx/new_game/name_chinese.png"]["direct_source_references"], [])
+
     def test_unreferenced_does_not_mean_unused(self):
         with tempfile.TemporaryDirectory() as folder:
             root = Path(folder)
