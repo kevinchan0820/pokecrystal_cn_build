@@ -29,6 +29,11 @@ git -C pokecrystal_cn checkout --detach FETCH_HEAD
 echo "Using 1.x source: $SOURCE_BRANCH ($(git -C pokecrystal_cn rev-parse --short HEAD))"
 # Pin the exact source commit in every CI artifact for reproducible QA.
 git -C pokecrystal_cn rev-parse HEAD > zh_tw_source_commit.txt
+# Require bounded ROM dictionary searches before compiling: invalid
+# Quick or Pinyin input must never scan past the candidate index table.
+python3 tools/zh_tw_ime_bounds_audit.py \
+  --source pokecrystal_cn \
+  --report zh_tw_ime_bounds_report.json
 # Identify actual game-ASM references before modifying suspected Simplified PNGs.
 # No direct reference does NOT imply unreachable runtime graphics.
 python3 tools/zh_tw_asset_reference_audit.py \
