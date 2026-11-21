@@ -137,14 +137,15 @@ def run(rom: Path, output: Path) -> dict:
         # State snapshots are only used to select a reliable route; the
         # final route is replayed from the original save dialog.
         at_prompt = capture_state()
-        confirmation_routes = [
-            ("a",), ("up", "a"), ("down", "a"),
-            ("a", "a"), ("up", "a", "a"), ("down", "a", "a"),
-            ("a", "up", "a"), ("a", "down", "a"),
-            ("up", "up", "a"), ("a", "a", "a"),
-            ("left", "a"), ("right", "a"),
-            ("a", "up", "up", "a"), ("a", "down", "down", "a"),
-        ]
+        # Explore short deterministic controller sequences, not a guessed
+        # default YES position. Include B to distinguish dialog dismissal.
+        # Stop at first actual SavePlayerData CPU hook; then replay from the
+        # identical prompt state to exclude accidental stale hook events.
+        from itertools import product
+        confirmation_routes = [("a",)]
+        for depth in range(2, 5):
+            confirmation_routes.extend(product(("up", "down", "a", "b"), repeat=depth))
+        evidence["scenarios"]["save_prompt"]["route_search_size"] = len(confirmation_routes)
         confirmation = None
         for route in confirmation_routes:
             restore_state(at_prompt)
