@@ -109,7 +109,7 @@ def test(rom:Path, source:Path, output:Path)->dict:
                 raise AssertionError("%s pointed outside Cangjie candidate buffer"%code)
             expected=char_code(source/"constants/charmap_cn.asm",character)
             count=val("wIMEFullCandidateCount")
-            if not 1<=count<=8:
+            if not 1<=count<=7:
                 raise AssertionError("%s candidate count out of range"%code)
             candidates=[[val("wIMEFullCandidates",2*j),
                          val("wIMEFullCandidates",2*j+1)] for j in range(count)]
