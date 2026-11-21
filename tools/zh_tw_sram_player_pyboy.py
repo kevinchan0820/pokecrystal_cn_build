@@ -44,6 +44,11 @@ def run(rom: Path, output: Path) -> dict:
                                    lambda events: events.append(True), save_menu)
         rom_emulator.hook_register(None, "SavePlayerData",
                                    lambda events: events.append(True), saved_player)
+        bag_events, trainer_card_events = [], []
+        rom_emulator.hook_register(None, "Pack",
+                                   lambda events: events.append(True), bag_events)
+        rom_emulator.hook_register(None, "TrainerCard",
+                                   lambda events: events.append(True), trainer_card_events)
         yes_no_events = []
         rom_emulator.hook_register(None, "SaveTheGame_yesorno",
                                    lambda events: events.append(True), yes_no_events)
@@ -130,6 +135,35 @@ def run(rom: Path, output: Path) -> dict:
             "screen": snapshot("start_menu"),
             "initial_command": selected_command(),
         }
+        # Verify actual Bag and Trainer Card scene entry, not just their
+        # source-image pixel assets. The START menu at this scene begins
+        # on PACK=2, followed by STATUS=3; these use real D-pad input.
+        # Save-state snapshots ONLY isolate independent screen captures;
+        # the subsequent battery SRAM acceptance still performs a real
+        # in-game SAVE and fresh emulator CONTINUE.
+        restore_state(open_menu)
+        if selected_command() != 2:
+            raise AssertionError("START menu did not initially select Pack")
+        bag_before = len(bag_events)
+        key("a", 200)
+        if len(bag_events) <= bag_before:
+            raise AssertionError("Real Pack scene was not entered from START menu")
+        evidence["scenarios"]["bag_real_runtime"] = {
+            "screen": snapshot("actual_bag"),
+            "controller_route": ["a"], "cpu_hook_pack": True}
+
+        restore_state(open_menu)
+        key("down", 20)
+        if selected_command() != 3:
+            raise AssertionError("START menu D-pad did not focus Trainer Card")
+        card_before = len(trainer_card_events)
+        key("a", 200)
+        if len(trainer_card_events) <= card_before:
+            raise AssertionError("Real Trainer Card was not entered from START menu")
+        evidence["scenarios"]["trainer_card_real_runtime"] = {
+            "screen": snapshot("actual_trainer_card"),
+            "controller_route": ["down", "a"], "cpu_hook_trainer_card": True}
+
         # Try down positions from the actual open START menu, checking the
         # CPU's SaveMenu hook. Search uses emulator snapshots only to
         # avoid having to replay the entire intro for every menu row.
