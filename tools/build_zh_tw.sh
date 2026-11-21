@@ -119,6 +119,15 @@ python3 tools/zh_tw_cangjie_full.py \
   --output pokecrystal_cn/data/ime/ime_cangjie_v1.asm \
   --report zh_tw_cangjie_v1_dictionary_report.json \
   --strict
+# Use genuine OpenVanilla Taiwan ㄅㄆㄇ...ˊˇˋ˙ dictionary (MIT).
+# This is phonetic composition, not a Pinyin->Chinese alias. Full glyph
+# code map MUST be generated after the 41 symbol fonts are remapped.
+python3 tools/zh_tw_zhuyin_full.py \
+  --charmap pokecrystal_cn/constants/charmap_cn.asm \
+  --output pokecrystal_cn/data/ime/ime_zhuyin_v1.asm \
+  --symbol-map pokecrystal_cn/data/ime/ime_zhuyin_symbol_map.asm \
+  --report zh_tw_zhuyin_v1_report.json \
+  --strict
 # Verify that actual 12x12 glyph *pixels*, including 好, are Taiwan style,
 # not legacy Mainland Simplified glyphs retained from a shared codepoint.
 python3 tools/zh_tw_glyph_qa.py \
