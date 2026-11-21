@@ -13,6 +13,7 @@ import io
 import json
 import re
 from pathlib import Path
+from PIL import Image
 from pyboy import PyBoy
 
 from zh_tw_quick_pyboy import ROUTES, char_code
@@ -143,6 +144,28 @@ def run(rom, source, folder):
                 raise AssertionError(f"Quick key {chr(65+i)} is not the Rime root bitmap")
         quick_screen = gb.screen.image.copy()
         snapshot("quick_radicals_raw")
+        # Critical visual regression: old tests saw roots in VRAM bank 0
+        # but the Q-Z row was STILL Latin on actual PyBoy screen!
+        # Compare literal 8x8 visible pixels for every second-row key
+        # against the approved 26-root atlas. This must be SCREEN-level.
+        root_atlas = Image.open(source / "gfx/naming_screen/cangjie_roots.png").convert("L")
+        second_row_xs = (8, 16, 24, 32, 40, 56, 64, 72, 80, 88)
+        screen_rgb = quick_screen.convert("RGB")
+        second_row_visual_errors = []
+        for offset, x in enumerate(second_row_xs):
+            index = offset + 16  # Q-Z = 手口尸廿山女田難卜符
+            different = sum(
+                (sum(screen_rgb.getpixel((x+dx, 80+dy))) < 350) !=
+                (root_atlas.getpixel((index*8+dx, dy)) < 128)
+                for dy in range(8) for dx in range(8))
+            if different:
+                second_row_visual_errors.append(
+                    {"key": chr(65+index), "wrong_pixels": different})
+        result["second_row_screen_pixel_audit"] = second_row_visual_errors
+        if second_row_visual_errors:
+            raise AssertionError(
+                f"Quick Q-Z still visually Latin despite VRAM test: "
+                f"{second_row_visual_errors}")
         attr_bank, attr_start = addr["wAttrmap"]
         keyboard_attrs = [gb.memory[attr_bank, attr_start + row*20 + col]
                           for row in (8,9) for col in (1,2,3,4,5,7,8,9,10,11)]
