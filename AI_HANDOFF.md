@@ -15,13 +15,17 @@ KC 要交付 **可重現構建、完整可玩、台港繁體像素字形正確�
 | Game source (ASM, graphics, IME) | [kevinchan0820/pokecrystal_cn](https://github.com/kevinchan0820/pokecrystal_cn/tree/feature/zh-hant-tw-hk-1x) | `feature/zh-hant-tw-hk-1x` |
 | Build, QA, reproducible IPS | [kevinchan0820/pokecrystal_cn_build](https://github.com/kevinchan0820/pokecrystal_cn_build/tree/feature/zh-hant-tw-hk-1x) | `feature/zh-hant-tw-hk-1x` |
 
-**Latest tested gameplay source at this handoff:** `525f6728ec3d04ede5517fe079a462db72670aab`. **Previously verified complete workflow:** [GitHub Actions #44873879766](https://github.com/kevinchan0820/pokecrystal_cn_build/actions/runs/44873879766), build source code commit `8ef9e14b5f88640d83e26ce6d1bb8d4d56d12d4f`. Earlier full suite green; handoff automation code added after this run, so re-check newer run before claiming current green.
+**Latest verified CI:** [#44878037890](https://github.com/kevinchan0820/pokecrystal_cn_build/actions/runs/44878037890), SUCCESS, tested game source `88c39dc044109e3497e90b3659daa8662a886fa4`, workflow build commit `2659ffefc44f48a07baa676d7fc9707982879c00`. Artifact provides `zh_tw_ci_handoff.json`: nine scoped tests pass, four real PyBoy screen references, patch SHA256, `release_ready: false`. Later Markdown-only commits do not retrigger CI. Always re-check live branch heads and the latest Action.
 
 **FIRST ACTION EVERY SESSION:** Read *live* branch heads, latest Action run for the build branch, job logs, downloadable artifact, and current [EXECUTION_STATE.md](EXECUTION_STATE.md). Exact run evidence is more authoritative than old green notes. If current HEAD includes only Markdown changes, CI may not retrigger (`paths-ignore: '**/*.md'`); use latest successful code SHA only if source SHA matches.
 
 The Actions artifact now provides `zh_tw_ci_handoff.json`, `zh_tw_ci_handoff.md`, `zh_tw_source_commit.txt`, PNG screenshots, per-test JSON reports and IPS checksum. These are machine-readable **run evidence**, not release approval.
 
 ## 3. Verified functionality, without exaggerating
+
+- **This continuation fixed REAL Simplified inline ASM names:** `data/player_names.asm` had `自己决定／小阳／克丽丝／千瑶` (not workbook strings); corrected to `自己決定／小陽／克麗絲／千瑤`. Source-level test `zh_tw_player_names_report.json` in CI #44878037890 verified true, zero failures. Runtime selection screen still requires visual proof.
+- **Source reference discovery:** new `zh_tw_asset_reference_report.json` scanned 2,510 source/build files and proved `gfx/new_game/name_chinese.png` is referenced by `engine/gfx/player_gfx.asm:80` (`PlayerGFX_Name`). The raster is loaded by `ShowPlayerNamingChoices`; **in-game rendering and regional pixel correctness have NOT been visually accepted yet**.
+- **Cross-session handoff was exercised:** the existing hourly agent read `AI_HANDOFF.md` and recorded an independent false-positive inline-comment bug fix in `EXECUTION_STATE.md`. Recovery is demonstrated for this step, not a guarantee of indefinite future agent availability.
 
 - 1.x source compiles and boots in PyBoy; initial menus, options, naming flows are exercised in GitHub Actions.
 - Quick **tiny prototype dictionary**: real controller `AA → 晶`, `AB → 明`, `VD → 好` with actual candidate selection and named bytes.
@@ -34,12 +38,12 @@ The Actions artifact now provides `zh_tw_ci_handoff.json`, `zh_tw_ci_handoff.md`
 1. True practical HK Quick dictionary, multiple candidates, paging, wrong-code/delete, persistent player and Pokémon nicknames.
 2. Full HK Cangjie compose and lookup, Taiwan Zhuyin symbol/tones input, 8x8 font UX.
 3. Actual PyBoy gameplay screen acceptance: battle/burn status, bag, Trainer Card, credits, overworld, story text, name screen and save/load.
-4. Edit remaining visible raster assets only if truly used: unresolved `gfx/new_game/name_chinese.png` needs trace of source references + screen, not random replacement.
+4. `gfx/new_game/name_chinese.png` IS referenced by `engine/gfx/player_gfx.asm:80`; reach `ShowPlayerNamingChoices` in actual PyBoy, capture screen, validate its pixel text and the four newly Traditionalized player-name choices. Do not assume static reference alone proves the rendering.
 5. Regional editorial review beyond mechanical OpenCC; no claims of 100% coverage without real verification.
 
 ### NEXT EXECUTABLE TASK (do it; don't ask KC to continue)
 
-Use GitHub connected API and current branch; check if current/latest CI now emits `zh_tw_ci_handoff.json`. If CI RED, inspect job logs and repair manifest/test first; rerun. Then **trace `gfx/new_game/name_chinese.png` usages** across built game ASM and classify as referenced/unreferenced (explicit references do NOT prove runtime rendering). Add reproducible source reference report to CI. Follow up with actual PyBoy Bag/Trainer Card and battle scenarios. Continue to further release blockers within available execution.
+Read latest GitHub source and build heads and the current `zh_tw_ci_handoff.json` from [#44878037890](https://github.com/kevinchan0820/pokecrystal_cn_build/actions/runs/44878037890) or a newer exact-head run. **First independent release gate:** make a real PyBoy screenshot test of `ShowPlayerNamingChoices` showing the approved Traditional choice `自己決定`, presets `小陽／克麗絲／千瑤`, and the real `PlayerGFX_Name` bitmap. If the 40×8 bitmap is non-Taiwan glyph art, create a failing raster test, replace only the sourced asset and rerun CI/PyBoy. Then validate Bag, Trainer Card and burned battle as actual visible scenes; continue to the remaining practical Quick/Cangjie/Zhuyin/save-load blockers.
 
 ## 5. Execution rules (trigger on Intent, not magic words)
 
