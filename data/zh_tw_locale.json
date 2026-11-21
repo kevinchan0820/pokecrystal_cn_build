@@ -308,6 +308,306 @@
       "scope": "dialogue",
       "expected_count": 1,
       "reason": "Verified directly against English/Japanese source rows; preserve dialogue meaning and short GBC lines."
+    },
+    {
+      "id": "save-confirm",
+      "scope": "dialogue",
+      "sheet": "文3",
+      "cell": "E1140",
+      "from": "冒險記錄嗎？",
+      "to": "要儲存遊戲嗎？",
+      "expected_count": 1,
+      "reason": "English: save the game?"
+    },
+    {
+      "id": "save-in-progress",
+      "scope": "dialogue",
+      "sheet": "文3",
+      "cell": "E1144",
+      "from": "正在寫入記錄……",
+      "to": "正在儲存遊戲……",
+      "expected_count": 1,
+      "reason": "English: SAVING... DON'T TURN"
+    },
+    {
+      "id": "save-success",
+      "scope": "dialogue",
+      "sheet": "文3",
+      "cell": "E1150",
+      "from": "完好地寫下了記錄！",
+      "to": "遊戲已儲存！",
+      "expected_count": 1,
+      "reason": "English: saved the game"
+    },
+    {
+      "id": "save-old-file",
+      "scope": "dialogue",
+      "sheet": "文3",
+      "cell": "E1154",
+      "from": "之前寫入的記錄",
+      "to": "先前的儲存資料",
+      "expected_count": 1,
+      "reason": "English: There is already a save file"
+    },
+    {
+      "id": "save-overwrite",
+      "scope": "dialogue",
+      "sheet": "文3",
+      "cell": "E1161",
+      "from": "冒險記錄被寫入了！",
+      "to": "已經有儲存資料！",
+      "expected_count": 1,
+      "reason": "English: save file. Is it (okay to overwrite?)"
+    },
+    {
+      "id": "save-data-contents",
+      "scope": "dialogue",
+      "sheet": "文3",
+      "cell": "E1166",
+      "from": "記錄的內容",
+      "to": "儲存資料的內容",
+      "expected_count": 1,
+      "reason": "English: The save file is"
+    },
+    {
+      "id": "save-box",
+      "scope": "dialogue",
+      "sheet": "文3",
+      "cell": "E1172",
+      "from": "會同時寫入記錄。",
+      "to": "也會一起儲存。",
+      "expected_count": 1,
+      "reason": "English: Pokémon BOX data"
+    },
+    {
+      "id": "save-okay",
+      "scope": "dialogue",
+      "sheet": "文3",
+      "cell": "E1179",
+      "from": "都會寫入記錄。",
+      "to": "都會一起儲存。",
+      "expected_count": 1,
+      "reason": "English: will be saved. OK?"
+    },
+    {
+      "id": "mobile-save-send",
+      "scope": "dialogue",
+      "sheet": "文3",
+      "cell": "E418",
+      "from": "正在傳送寶可夢記錄……",
+      "to": "正在傳送存檔……",
+      "expected_count": 1,
+      "reason": "English: SAVE FILE will be"
+    },
+    {
+      "id": "mobile-save-sent",
+      "scope": "dialogue",
+      "sheet": "文3",
+      "cell": "E423",
+      "from": "寶可夢記錄已傳送！",
+      "to": "存檔已傳送！",
+      "expected_count": 1,
+      "reason": "English: Sent SAVE FILE."
+    },
+    {
+      "id": "mobile-save-transfer",
+      "scope": "dialogue",
+      "sheet": "文3",
+      "cell": "E442",
+      "from": "傳送寶可夢記錄！",
+      "to": "傳送存檔！",
+      "expected_count": 1,
+      "reason": "English: SAVE FILE."
+    },
+    {
+      "id": "facility-save-first",
+      "scope": "dialogue",
+      "sheet": "文5",
+      "cell": "E1450",
+      "from": "必須先寫入記錄，",
+      "to": "必須先儲存遊戲，",
+      "expected_count": 1,
+      "reason": "Japanese: no continued challenge until saving"
+    },
+    {
+      "id": "facility-save-not-finished",
+      "scope": "dialogue",
+      "sheet": "文5",
+      "cell": "E1578",
+      "from": "並沒有完好地寫下記錄。",
+      "to": "遊戲尚未儲存完成。",
+      "expected_count": 1,
+      "reason": "English: before exiting, Japanese: did not complete properly"
+    },
+    {
+      "id": "facility-save-before",
+      "scope": "dialogue",
+      "sheet": "文5",
+      "cell": "E1601",
+      "from": "將會寫入記錄。",
+      "to": "將會儲存遊戲。",
+      "expected_count": 1,
+      "reason": "English: be SAVED before"
+    },
+    {
+      "id": "facility-save-end",
+      "scope": "dialogue",
+      "sheet": "文5",
+      "cell": "E1608",
+      "from": "寫入記錄並結束，",
+      "to": "儲存後結束，",
+      "expected_count": 1,
+      "reason": "English: SAVE and end the"
+    },
+    {
+      "id": "facility-save-before-2",
+      "scope": "dialogue",
+      "sheet": "文5",
+      "cell": "E1614",
+      "from": "將會寫入記錄。",
+      "to": "將會儲存遊戲。",
+      "expected_count": 1,
+      "reason": "English: be SAVED before"
+    },
+    {
+      "id": "link-save",
+      "scope": "dialogue",
+      "sheet": "文5",
+      "cell": "E2952",
+      "from": "將寫下記錄。",
+      "to": "必須先儲存。",
+      "expected_count": 1,
+      "reason": "English: before link, you must save"
+    },
+    {
+      "id": "save-tip",
+      "scope": "dialogue",
+      "sheet": "文5",
+      "cell": "E3446",
+      "from": "一定要仔細地寫下記錄。",
+      "to": "記得經常儲存遊戲。",
+      "expected_count": 1,
+      "reason": "Japanese: save frequently"
+    },
+    {
+      "id": "facility-vs-save",
+      "scope": "dialogue",
+      "sheet": "文9",
+      "cell": "E116",
+      "from": "必須先寫入記錄，",
+      "to": "必須先儲存遊戲，",
+      "expected_count": 1,
+      "reason": "Japanese: no continued challenge until saving"
+    },
+    {
+      "id": "facility-battle-save",
+      "scope": "dialogue",
+      "sheet": "文9",
+      "cell": "E189",
+      "from": "將會寫入記錄。",
+      "to": "將會儲存遊戲。",
+      "expected_count": 1,
+      "reason": "Japanese: レポートをかきます"
+    },
+    {
+      "id": "old-prc-surprised",
+      "scope": "dialogue",
+      "sheet": "文1",
+      "cell": "E3549",
+      "from": "哦喲，嚇到了嗎？",
+      "to": "怎麼，嚇到了嗎？",
+      "expected_count": 1,
+      "reason": "Japanese: おじけづいたか, are you scared?"
+    },
+    {
+      "id": "bank-no-balance",
+      "scope": "dialogue",
+      "sheet": "文2",
+      "cell": "E4033",
+      "from": "你可沒存那麼多錢喲。",
+      "to": "你沒存那麼多錢喔。",
+      "expected_count": 1,
+      "reason": "English: You haven't saved that much"
+    },
+    {
+      "id": "bank-over-carry",
+      "scope": "dialogue",
+      "sheet": "文2",
+      "cell": "E4038",
+      "from": "你不能帶那麼多錢喲。",
+      "to": "你帶不了那麼多錢喔。",
+      "expected_count": 1,
+      "reason": "English: You can't take that much"
+    },
+    {
+      "id": "bank-over-deposit",
+      "scope": "dialogue",
+      "sheet": "文2",
+      "cell": "E4048",
+      "from": "你不能存這麼多錢喲。",
+      "to": "沒辦法存這麼多錢喔。",
+      "expected_count": 1,
+      "reason": "English: You can't save that much"
+    },
+    {
+      "id": "hot-battle",
+      "scope": "dialogue",
+      "sheet": "文5",
+      "cell": "E2460",
+      "from": "喲，還挺厲害！",
+      "to": "哇，還真厲害！",
+      "expected_count": 1,
+      "reason": "Japanese: やるなあ, impressive"
+    },
+    {
+      "id": "who-are-you",
+      "scope": "dialogue",
+      "sheet": "文6",
+      "cell": "E4892",
+      "from": "喲，您哪位啊？",
+      "to": "咦，你是誰啊？",
+      "expected_count": 1,
+      "reason": "English: Hm? Who are you?"
+    },
+    {
+      "id": "force-pokemon",
+      "scope": "dialogue",
+      "sheet": "文6",
+      "cell": "E4903",
+      "from": "強迫寶可夢做壞事兒、",
+      "to": "逼寶可夢做壞事，",
+      "expected_count": 1,
+      "reason": "Japanese: むりやりわるさにつかう, force Pokémon to do wrong"
+    },
+    {
+      "id": "large-city",
+      "scope": "dialogue",
+      "sheet": "文7",
+      "cell": "E501",
+      "from": "嗬喲，這城市真氣派啊！",
+      "to": "哇，這城市真大！",
+      "expected_count": 1,
+      "reason": "English: This is one big town!"
+    },
+    {
+      "id": "battle-strong-speaker",
+      "scope": "dialogue",
+      "sheet": "文9",
+      "cell": "E363",
+      "from": "我很淡定，喲！",
+      "to": "我狀態正好，",
+      "expected_count": 1,
+      "reason": "English: I'm on top of my"
+    },
+    {
+      "id": "battle-weak-target",
+      "scope": "dialogue",
+      "sheet": "文9",
+      "cell": "E364",
+      "from": "你很震驚，喲！",
+      "to": "你可不一樣！",
+      "expected_count": 1,
+      "reason": "English: game, but not you!"
     }
   ]
 }
