@@ -28,7 +28,7 @@ class BattleWordingTests(unittest.TestCase):
         self.save()
         result = inspect(self.path)
         self.assertTrue(result["verified"], result["errors"])
-        self.assertEqual(len(result["canonical_battle_checks"]), 3)
+        self.assertEqual(len(result["canonical_battle_checks"]), len(CANONICAL))
 
     def test_reject_legacy_effectiveness_phrase(self):
         self.book["文3"]["E150"] = "效果拔群！"
