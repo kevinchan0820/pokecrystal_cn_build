@@ -1,0 +1,50 @@
+name: 1.x Quick full-dictionary compiler (licensed data staging)
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - feature/zh-hant-tw-hk-1x
+    paths:
+      - tools/zh_tw_quick_dictionary_v2.py
+      - tools/test_zh_tw_quick_dictionary_v2.py
+      - .github/workflows/quick-corpus-ci.yml
+
+permissions:
+  contents: read
+
+jobs:
+  compile-licensed-dictionary:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Prepare Python and fetch game glyph map
+        run: |
+          python3 -m pip install --user opencc-python-reimplemented
+          git clone --depth 1 --branch feature/zh-hant-tw-hk-1x https://github.com/kevinchan0820/pokecrystal_cn.git pokecrystal_cn
+          git -C pokecrystal_cn rev-parse HEAD > generated_source_sha.txt
+      - name: Test Quick dictionary compiler and ROM section budget
+        run: python3 -m unittest discover -s tools -p 'test_zh_tw_quick_dictionary_v2.py' -v
+      - name: Generate full MIT-source, Traditional-only Quick corpus
+        run: |
+          python3 tools/zh_tw_quick_dictionary_v2.py \
+            --charmap pokecrystal_cn/constants/charmap_cn.asm \
+            --output generated/quick_v2_data.asm \
+            --report generated/zh_tw_quick_v2_dictionary_report.json \
+            --strict
+          curl -fsSL https://raw.githubusercontent.com/cangjie-system/rime-cangjie-integrated/dcfba770189078a2f7b347793c8e155c3c39275d/LICENSE \
+            -o generated/LICENSE_CANGJIE_MIT.txt
+          sha256sum generated/quick_v2_data.asm generated/zh_tw_quick_v2_dictionary_report.json \
+            > generated/sha256.txt
+      - name: Upload licensed staging data (NOT playable ROM, NOT released IME)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: crystal-1x-quick-v2-dictionary-staging
+          path: |
+            generated/quick_v2_data.asm
+            generated/zh_tw_quick_v2_dictionary_report.json
+            generated/LICENSE_CANGJIE_MIT.txt
+            generated/sha256.txt
+            generated_source_sha.txt
+          if-no-files-found: warn
