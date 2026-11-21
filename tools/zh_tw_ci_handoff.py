@@ -9,6 +9,8 @@ from pathlib import Path
 
 REQUIRED = {
     "real_quick_entry": ("zh_tw_quick_pyboy_report.json", "passed"),
+    "real_full_cangjie_controller": ("zh_tw_cangjie_runtime_report.json", "passed"),
+    "real_taiwan_zhuyin_controller": ("zh_tw_zhuyin_runtime_report.json", "passed"),
     "real_26_key_visuals": ("zh_tw_quick_ui_report.json", "passed"),
     "deep_name_entry": ("zh_tw_naming_deep_report.json", "passed"),
     "trainer_card_raster": ("zh_tw_trainer_card_raster_report.json", "verified"),
@@ -20,18 +22,24 @@ REQUIRED = {
 }
 SCREENS = [
     "zh_tw_quick_ui_quick_radical_keyboard.png",
+    "zh_tw_quick_ui_typed_VD.png",
     "zh_tw_quick_ui_name_HAO.png",
+    "zh_tw_cangjie_five_root_mode.png",
+    "zh_tw_cangjie_typed_VND.png",
+    "zh_tw_cangjie_committed_VND.png",
+    "zh_tw_zhuyin_real_mode7_zhuyin.png",
+    "zh_tw_zhuyin_typed_4_symbols.png",
+    "zh_tw_zhuyin_committed_4.png",
+    "zh_tw_zhuyin_committed_1.png",
     "zh_tw_ui_title.png",
     "zh_tw_ui_options.png",
 ]
 UNFINISHED = [
-    "Full HK Quick dictionary / paging / deletion / invalid code",
-    "Genuine Cangjie full-code entry",
-    "Taiwan Zhuyin symbols and tones",
-    "Trainer and Pokemon nickname SRAM save/reload",
-    "Actual in-game burn battle, bag and Trainer Card visual checks",
-    "All visible scenes and regional language editorial acceptance",
-    "Human visual legibility check for all 8x8 radicals",
+    "Full player and Pokemon nickname flow plus SRAM save/reload",
+    "Actual in-game burn battle, Bag and Trainer Card screenshots",
+    "Full-game Traditional font/raster/editorial and scene acceptance",
+    "Human readability of every 8x8 Cangjie and 41 Zhuyin key glyph",
+    "Full IME edge-case stress and save corruption regression matrix",
 ]
 
 def digest(path):
