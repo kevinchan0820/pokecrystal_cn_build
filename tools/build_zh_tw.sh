@@ -112,6 +112,13 @@ python3 tools/zh_tw_quick_dictionary_v2.py \
   --output pokecrystal_cn/data/ime/ime_quick_v2.asm \
   --report zh_tw_quick_v2_dictionary_report.json \
   --strict
+# Full Cangjie uses the same MIT source with the complete 1..5 root
+# codes. Generator writes bounded 7-byte ROM records after font remapping.
+python3 tools/zh_tw_cangjie_full.py \
+  --charmap pokecrystal_cn/constants/charmap_cn.asm \
+  --output pokecrystal_cn/data/ime/ime_cangjie_v1.asm \
+  --report zh_tw_cangjie_v1_dictionary_report.json \
+  --strict
 # Verify that actual 12x12 glyph *pixels*, including 好, are Taiwan style,
 # not legacy Mainland Simplified glyphs retained from a shared codepoint.
 python3 tools/zh_tw_glyph_qa.py \
