@@ -48,6 +48,12 @@ python3 tools/zh_tw_pack_pocket_qa.py \
   --source pokecrystal_cn \
   --font "$FONT_FILE" \
   --report zh_tw_pack_pocket_audit_report.json
+# Trainer-card status is a 48x8 PRC raster, not spreadsheet text.
+# Red/green regression: approved 目前狀態 TC pixels, not 当前状态.
+python3 tools/zh_tw_trainer_card_raster_qa.py \
+  --source pokecrystal_cn \
+  --font "$FONT_FILE" \
+  --report zh_tw_trainer_card_raster_report.json
 python3 tools/zh_tw_prepare.py \
   --input text.xlsx \
   --output text.zh-TW.xlsx \
