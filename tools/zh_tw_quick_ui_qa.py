@@ -269,9 +269,14 @@ def run(rom, source, folder):
         restore(invalid_two)
         invalid_pointer = (val("wIMEBank"),
                            val("wIMEAddr") | val("wIMEAddr", 1) << 8)
-        empty_pointer = gb.symbol_lookup("QuickV2CandidatesEmpty")
-        if invalid_pointer != empty_pointer:
-            raise AssertionError(f"Quick ZZ looked beyond last key: {invalid_pointer}")
+        # Full v2 table contains one *independent* empty record for
+        # each absent two-root combination, rather than reusing a single
+        # global fallback pointer. Expect the ZZ slot itself with 0 rows.
+        expected_slot = gb.symbol_lookup("QuickV2_ZZ")
+        if invalid_pointer != expected_slot:
+            raise AssertionError(f"Quick ZZ direct index escaped its own slot: {invalid_pointer} vs {expected_slot}")
+        if gb.memory[invalid_pointer[0],invalid_pointer[1]] != 0x50:
+            raise AssertionError("Absent Quick ZZ slot lacks a safe @ terminator")
         if val("wIMEMaxLine") != 0:
             raise AssertionError("Quick ZZ returned candidates from non-dictionary ROM")
         if val("wNamingScreenCurNameLength") != 0:
