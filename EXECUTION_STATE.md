@@ -1,5 +1,15 @@
 # Crystal 1.x — durable execution state
 
+## Checkpoint — 2026-11-21 13:55+08:00 — real PyBoy screenshot zoom evidence
+
+- Read current EXECUTION_STATE, SUPERPOWERS_EXECUTION, TRUE_IME_ACCEPTANCE, and .agents/skills/crystal-end-to-end-localization/SKILL.md. Reviewed actual naming PyBoy QA implementation and prior CI artifact #44872657612. The previously green run predates this commit and MUST NOT be counted as exact-head validation.
+- Build branch commit `da6fef7d8cd2c66e13436e91b8afbb2575e77c30`: `tools/zh_tw_quick_ui_qa.py` now emits unmodified 160x144 screenshots plus 640x576 nearest-neighbor inspection copies for every snapshot. This is a test-evidence improvement, NOT a root-font fix. It preserves real emulator pixels and permits human review of 日月金木水 and complex roots.
+- Observed blocker: 8x8 root tiles (especially complex 難/符) are not yet certified legible. Existing test only verifies byte equality and VRAM bank mapping, which does not prove human readability. A visual acceptance check and approved pixel redesign are required; do not replace keycodes or claim an 8x8 glyph is readable merely because bytes match.
+- Environment blocker: local `git ls-remote` cannot resolve github.com. No local ROM compile, PyBoy execution, RED/GREEN raster fix, or new exact-head CI result was obtained in this checkpoint. Existing #44872657612 screenshots are older evidence only.
+- Next: inspect new exact-head CI for `da6fef7` (and its source SHA), retrieve generated 4x screenshots, compare every 26 root glyph at native and zoom scales; create failing per-glyph visual/raster acceptance assertions, patch source `gfx/naming_screen/cangjie_roots.png` and .1bpp, rerun ROM+PyBoy; then handle name_chinese.png, bag live screen, full Quick candidate paging, SRAM, nickname, Zhuyin/Cangjie. No ROM redistribution or 1.0 merge.
+- Release gate: BLOCKED. Unverified: human legibility of all 26 radicals, live bag and name_chinese raster, candidate paging, full dictionary, save/load, nickname, Zhuyin, Cangjie, all-scene Traditional audit.
+
+
 ## Verified checkpoint — 2026-11-21: Trainer Card raster Traditional, exact CI green
 
 - **Source commit:** `kevinchan0820/pokecrystal_cn@bb2087cfeb9082d0a3e0f1ad887fde9b538112b9` (only `feature/zh-hant-tw-hk-1x`). **Build code commit:** `kevinchan0820/pokecrystal_cn_build@09523558c973dca7dd0eba000d24420e3acd4421`; later docs-only audit `f4c4947524e96f9e0c34ccd746074fefe151cb8c`.
