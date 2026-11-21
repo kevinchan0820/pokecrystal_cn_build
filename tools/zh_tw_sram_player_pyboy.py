@@ -137,6 +137,19 @@ def run(rom: Path, output: Path) -> dict:
         # State snapshots are only used to select a reliable route; the
         # final route is replayed from the original save dialog.
         at_prompt = capture_state()
+        # A SaveMenu entry hook alone does not prove that the yes/no dialog
+        # is visible: the routine may still be rendering text. Record a
+        # controller-independent CPU checkpoint and the menu cursor so that
+        # a failed CI distinguishes an unopened dialog from bad button input.
+        yes_no_events = []
+        rom_emulator.hook_register(None, "SaveTheGame_yesorno",
+                                   lambda events: events.append(True), yes_no_events)
+        evidence["scenarios"]["save_prompt"]["diagnostic"] = {
+            "cursor_y": value("wMenuCursorY") if "wMenuCursorY" in addr else None,
+            "screen_before_search": snapshot("save_prompt_before_search"),
+            "save_menu_hook_count": len(save_menu),
+            "save_player_hook_count": len(saved_player),
+        }
         # Explore short deterministic controller sequences, not a guessed
         # default YES position. Include B to distinguish dialog dismissal.
         # Stop at first actual SavePlayerData CPU hook; then replay from the
@@ -160,8 +173,14 @@ def run(rom: Path, output: Path) -> dict:
         if confirmation is None:
             evidence["scenarios"]["save_prompt"]["after_rejection"] = snapshot(
                 "save_yes_no_unresolved")
+            evidence["scenarios"]["save_prompt"]["diagnostic"].update({
+                "yes_no_hook_count": len(yes_no_events),
+                "save_player_hook_count_after_search": len(saved_player),
+                "screen_after_search": snapshot("save_prompt_after_search"),
+            })
             raise AssertionError("In-game SAVE yes/no was never confirmed; explored "+
-                                 str(len(confirmation_routes))+" actual D-pad routes")
+                                 str(len(confirmation_routes))+" actual D-pad routes; "+
+                                 "inspect zh_tw_sram_player_report.json and diagnostic PNGs")
         restore_state(at_prompt)
         count_before = len(saved_player)
         for button in confirmation:
