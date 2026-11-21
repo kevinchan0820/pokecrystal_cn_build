@@ -183,15 +183,19 @@ def test(rom:Path, source:Path, output:Path)->dict:
             "b_deleted_fifth_root":True}
         restore(original)
         button("select",35)
+        if val("wNamingScreenLetterCase")!=6:
+            raise AssertionError("Cangjie must transition into real Zhuyin mode6")
+        cases["zhuyin_separate_mode"]={"mode":6,"screen":frame("zhuyin_header")}
+        button("select",35)
         if val("wNamingScreenLetterCase")!=0:
-            raise AssertionError("Cangjie mode does not wrap to Pinyin")
+            raise AssertionError("Zhuyin mode does not wrap to Pinyin")
         cases["restore_original_pinyin"]={"passed":True,
                                           "screen":frame("pinyin_restored")}
     except Exception as exc:
         failures.append(type(exc).__name__+": "+str(exc))
     finally:
         gb.stop(save=False)
-        result={"passed":not failures and len(cases)==6,
+        result={"passed":not failures and len(cases)==7,
                 "test":"real full Cangjie5 VND/AAA/AB code-to-candidate-to-player-name",
                 "cases":cases,"failures":failures}
         (output/"zh_tw_cangjie_runtime_report.json").write_text(
