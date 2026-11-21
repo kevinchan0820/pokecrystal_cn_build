@@ -1,5 +1,15 @@
 # Crystal 1.x — durable execution state
 
+## Execution checkpoint — 2026-11-21 12:51 Asia/Taipei (verification blocked)
+
+- Read current branch versions of EXECUTION_STATE, SUPERPOWERS_EXECUTION, TRUE_IME_ACCEPTANCE, and crystal-end-to-end-localization SKILL. Confirmed workflow triggers on source-code push and ignores Markdown-only changes.
+- Investigated `gfx/new_game/name_chinese.png`: source GitHub connector's UTF-8 fetch failed with UnicodeDecodeError at PNG signature (binary PNG, not a text file). **No pixel audit was completed**, no claim that this asset is Traditional or even used in runtime. Next: retrieve as base64, decode PNG, trace assembly reference, inspect pixel raster and actual PyBoy scene; add RED/ GREEN bitmap regression if visibly wrong.
+- Existing latest *documented* successful run is #44867512509, but **not verified as latest exact-head run in this execution**. GitHub commit search returned commits without proving branch association. Latest branch head, latest workflow run and artifact screenshots still require branch-scoped verification. A successful historical run is not a release gate.
+- Local checkout/build blocked: sandbox git ls-remote returned `Could not resolve host: github.com` for both repositories. No local ROM compile or PyBoy execution occurred in this checkpoint. No code/raster fix, no RED/GREEN evidence; don't call this a successful implementation iteration.
+- Remaining release gates: in-game bag pocket screenshot, `name_chinese.png` and other used raster assets, complete Quick vocabulary/ambiguity/paging/SRAM/nickname, genuine Zhuyin and Cangjie, linguistic review and all-scene visual acceptance.
+- Exact next action: obtain branch-specific latest head and CI status/artifact; inspect referenced `name_chinese.png` raster in emulator, implement a failing pixel assertion and fix it if necessary; compile and verify with real PyBoy before declaring green. Preserve 1.0 and never distribute ROM.
+
+
 ## Newest checkpoint — 2026-11-21, Traditional raster UI and pocket glyphs
 
 **Product definition:** All user-visible text/glyphs must be Taiwanese/Hong Kong Traditional; actual GBC raster images are as important as Unicode text. Follow [SUPERPOWERS_EXECUTION.md](SUPERPOWERS_EXECUTION.md) and do not stop after a fix until red/green tests, ROM compile, real PyBoy visual review, and a persistent next-action report.
