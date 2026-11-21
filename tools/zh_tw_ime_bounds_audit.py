@@ -44,7 +44,7 @@ def audit(root: Path):
         errors.append(f"Quick candidate-pointer count {count} != code count {len(qkeys)}")
     # Delimit actual ASM labels, not a branch operand 'jr nz, .start'.
     # The previous substring partition mistakenly cut off half the guard.
-    match = re.search(r"(?ms)^\\s*\\.miss\\s*\\n(.*?)^\\s*\\.start\\s*$", engine)
+    match = re.search(r"(?ms)^\s*\.miss\s*\n(.*?)^\s*\.start\s*$", engine)
     miss = match.group(1) if match else ""
     for token in ("QuickTBEnd", "PinyinTBEnd"):
         if token not in miss:
