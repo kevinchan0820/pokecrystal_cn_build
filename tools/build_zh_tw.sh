@@ -64,6 +64,13 @@ python3 tools/zh_tw_font.py \
   --extra-text cn_credits.diff \
   --font "$FONT_FILE" \
   --report zh_tw_font_report.json
+# Verify that actual 12x12 glyph *pixels*, including 好, are Taiwan style,
+# not legacy Mainland Simplified glyphs retained from a shared codepoint.
+python3 tools/zh_tw_glyph_qa.py \
+  --source pokecrystal_cn \
+  --font "$FONT_FILE" \
+  --report zh_tw_glyph_qa.json \
+  --png zh_tw_glyph_qa.png
 # Check whether common Taiwan/Hong Kong names can be entered via the current
 # Mandarin-Pinyin candidate tables; this is NOT a Taiwan Zhuyin/HK Cangjie IME.
 python3 tools/zh_tw_naming_audit.py \
