@@ -42,7 +42,10 @@ def audit(root: Path):
     count = len(ENTRY.findall(quick.partition("QuickTBEntry:")[2]))
     if count != len(qkeys):
         errors.append(f"Quick candidate-pointer count {count} != code count {len(qkeys)}")
-    miss = engine.partition(".miss\n")[2].partition(".start\n")[0]
+    # Delimit actual ASM labels, not a branch operand 'jr nz, .start'.
+    # The previous substring partition mistakenly cut off half the guard.
+    match = re.search(r"(?ms)^\\s*\\.miss\\s*\\n(.*?)^\\s*\\.start\\s*$", engine)
+    miss = match.group(1) if match else ""
     for token in ("QuickTBEnd", "PinyinTBEnd"):
         if token not in miss:
             errors.append("GetPinyinNo missing end-of-table guard: "+token)
