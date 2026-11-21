@@ -7,6 +7,12 @@ This is a project-specific adoption of [obra/superpowers](https://github.com/obr
 **One request = deliver the result, not a sequence of requests for the user to type "continue".**
 The parent goal is **a playable Pokémon Crystal 1.x Taiwan/Hong Kong Traditional Chinese IPS release and reproducible source, plus genuine input methods**. Progress on a subsystem, a green smoke test, or a handoff record is NOT completion of the parent goal.
 
+**Activation / no-premature-final gate (ChatGPT Project and scheduled executor):**
+- A request to "continue", "do it", "why did you stop?", "review Project Instructions", or the named final deliverable is **execution intent**. Start live GitHub reads and the first code/test/tool action **in the same assistant turn**, before writing a status or explaining why previous runs stopped.
+- A successful micro-fix, a docs handoff, a green historical run, or a CI run merely queued/in-progress is **not** a stopping rule. After a commit, poll the fresh exact-code-head run; if red, inspect the first failed step and patch; if green, inspect genuine PyBoy artifacts and proceed to the next unmet gate while tools remain usable.
+- "Update EXECUTION_STATE and next run resumes" is an **emergency checkpoint on an actual hard execution boundary**, not a substitute for running the next test. Never interpret this paragraph as permission to end after one tool call.
+- The ChatGPT Project Instructions can trigger actions **while a chat turn or scheduled automation is running**, but cannot keep one response executing after it ends. The existing hourly automation is the continuation mechanism; do not create a duplicate. Do not promise continuous background work beyond that schedule.
+
 **Executor rule for every scheduled run:**
 1. Read the source repo and build repo's actual current `feature/zh-hant-tw-hk-1x` heads, `EXECUTION_STATE.md`, `TRUE_IME_ACCEPTANCE.md`, this file and latest CI artifacts. Resolve discrepancies between stale notes and exact branch heads.
 2. Establish the remaining concrete failing **release acceptance tests**, automatically select the highest-priority actionable one, then immediately change/test actual implementation. Do not stop at a plan, status message, illustration, or already-green historical CI.
