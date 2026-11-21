@@ -68,6 +68,10 @@ jobs:
       - name: Verify Quick UI does not overlap keyboard and VD yields 好
         run: .venv/bin/python tools/zh_tw_quick_ui_qa.py build/pokecrystal11.gbc --source pokecrystal_cn --output .
 
+      - name: Test genuine full five-root Cangjie VND / AAA / AB in real PyBoy
+        if: success()
+        run: .venv/bin/python tools/zh_tw_cangjie_pyboy.py build/pokecrystal11.gbc --source pokecrystal_cn --output .
+
       - name: Build verified clean Crystal and generate a patch
         if: success()
         run: |
