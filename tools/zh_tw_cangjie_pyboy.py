@@ -85,6 +85,14 @@ def test(rom:Path, source:Path, output:Path)->dict:
         if val("wNamingScreenLetterCase")!=5:
             raise AssertionError("SELECT did not reach genuine Cangjie mode5")
         name=frame("five_root_mode")
+        # Render-level check catches gameplay corruption missed by name RAM
+        # tests: this name-panel rectangle must remain empty on entry.
+        white_space = gb.screen.image.convert("RGB").crop((100,8,145,18))
+        ink_count = sum(1 for pixel in white_space.getdata()
+                        if sum(pixel) < 420)
+        if ink_count > 3:
+            raise AssertionError(
+                f"Full Cangjie screen corrupted $7f background tile ({ink_count} pixels)")
         original=state()
         cases["independent_mode"]={"mode":5,"screen":name}
         root_atlas=(source/"gfx/naming_screen/cangjie_roots.1bpp").read_bytes()
