@@ -79,6 +79,10 @@ jobs:
       - name: Record ROM checksums (do not upload copyrighted ROM)
         if: success()
         run: find build -maxdepth 1 -name '*.gbc' -type f -exec sha256sum {} \; > zh_tw_rom_sha256.txt
+      - name: Generate exact-commit recovery evidence for next AI
+        if: success()
+        run: .venv/bin/python tools/zh_tw_ci_handoff.py
+
       - name: Upload diagnostics and translated workbook only
         if: always()
         uses: actions/upload-artifact@v4
@@ -89,6 +93,9 @@ jobs:
             zh_tw_*_report.json
             zh_tw_build.log
             zh_tw_rom_sha256.txt
+            zh_tw_source_commit.txt
+            zh_tw_ci_handoff.json
+            zh_tw_ci_handoff.md
             zh_tw_*.png
             zh_tw_emulator_report.json
             Crystal_Traditional_Chinese_TWHK_1x.ips
