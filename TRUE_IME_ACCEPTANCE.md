@@ -1,6 +1,6 @@
 # 1.x 真正輸入法 Priority & Release Gate
 
-**Status: NOT YET IMPLEMENTED.** The existing 1.x modes are Pinyin, English, Taiwan common-character picker and Hong Kong common-character picker. Existing green PyBoy tests show only picker/English/Pinyin entry, not true Zhuyin, Quick or Cangjie code lookup. Never advertise the latter as working or release 1.x based on those tests alone.
+**Status: PARTIAL PROOF OF CONCEPT — NOT A RELEASE.** The existing Pinyin, English, Taiwan and Hong Kong common-character pickers are *not* genuine regional IMEs. A fifth **Quick/速成** mode now performs actual code-to-candidate lookup for a **four-code test dictionary**: in GitHub Actions run [44863353708](https://github.com/kevinchan0820/pokecrystal_cn_build/actions/runs/44863353708), real PyBoy controller input **AA → 晶** and **AB → 明** both passed with matching compiled charmap/name bytes and screenshots. Quick dictionary breadth, invalid-code handling, candidate ambiguity/paging, saving/reloading, Pokémon nickname flow and all Zhuyin/Cangjie work remain unverified or unimplemented. Do not release 1.x or call the small dictionary a complete IME.
 
 ## Regional priority
 
