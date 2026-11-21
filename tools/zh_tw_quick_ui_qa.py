@@ -159,10 +159,14 @@ def run(rom, source, folder):
             "letter_a_vram_bank1": vram_bytes(1,0),
             "root_a_expected": list(expanded_root(0)),
         }
-        if any(x & 8 for x in keyboard_attrs):
-            raise AssertionError(
-                "Quick root keyboard must render from VRAM bank 0: found " +
-                str([x for x in keyboard_attrs if x & 8]))
+        # The original naming keyboard uses bank 1 on the first row
+        # (A-P), bank 0 on the second row (Q-Z). Changing that hardware
+        # attribute breaks the tested Quick input codes (AA/AB).
+        if not all(x & 8 for x in keyboard_attrs[:10]) or any(x & 8 for x in keyboard_attrs[10:]):
+            raise AssertionError("Original first-row/second-row VRAM bank mapping was corrupted")
+        for i in (0, 1, 2, 3, 5, 10, 15):
+            if vram_bytes(1, i) != list(expanded_root(i)):
+                raise AssertionError(f"Visible Quick key {chr(i+65)} is still Latin in VRAM bank1")
         # SELECT from Quick to Pinyin must restore the stock Latin alphabet.
         key("select", 35)
         if val("wNamingScreenLetterCase") != 0:
@@ -173,6 +177,9 @@ def run(rom, source, folder):
         snapshot("pinyin_latin_restored")
         result["root_display_diagnostics"]["latin_letter_a_bank0"] = vram_bytes(0,0)
         result["root_display_diagnostics"]["latin_letter_a_bank1"] = vram_bytes(1,0)
+        for i in (0, 1, 2, 3):
+            if vram_bytes(1,i) == list(expanded_root(i)):
+                raise AssertionError("Latin font not restored in VRAM bank1 after leaving Quick")
         if quick_screen.crop((8,64,152,80)).tobytes() == latin_screen.crop((8,64,152,80)).tobytes():
             raise AssertionError("Key display still looks identical in Latin and Cangjie modes")
         # Return to Quick: original keycodes and locations must remain intact.
@@ -183,6 +190,9 @@ def run(rom, source, folder):
         for i in samples:
             if key_pixels(i) != expanded_root(i):
                 raise AssertionError("Cangjie glyphs not restored on entering Quick again")
+        for i in (0,1,2,3,5,10,15):
+            if vram_bytes(1,i) != list(expanded_root(i)):
+                raise AssertionError("Cangjie keys not restored in first-row VRAM bank1")
         if keyboard() != stable_keys:
             raise AssertionError("Keyboard tile IDs changed; Quick lookup code would be corrupted")
         result["root_keyboard_qa"] = {
