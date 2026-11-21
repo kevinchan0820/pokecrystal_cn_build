@@ -25,6 +25,19 @@ def inspect(source: Path) -> dict:
         source / "data/ime/ime_table1.asm",
         source / "data/ime/ime_table2.asm",
     ]
+    quick_file = source / "data/ime/ime_twhk_common.asm"
+    quick_text = quick_file.read_text(encoding="utf-8")
+    quick_lists = {}
+    for territory in ("TW", "HK"):
+        label = f"CharTB_{territory}_Common::"
+        if label not in quick_text:
+            raise ValueError(f"Missing 1.x quick-name label: {label}")
+        section = quick_text.split(label, 1)[1].split("\\nCharTB_", 1)[0]
+        choices = "".join(INPUT_ENTRY.findall(section)).replace("@", "")
+        quick_lists[territory] = choices
+        if len(choices) < 48:
+            raise ValueError(f"{territory} 1.x quick-name list too short")
+
     input_chars = set()
     for path in ime_files:
         for entry in INPUT_ENTRY.findall(path.read_text(encoding="utf-8")):
@@ -39,19 +52,32 @@ def inspect(source: Path) -> dict:
     mode_labels = [
         "NamingScreen_ApplyTextInputModeChinese:",
         "NamingScreen_ApplyTextInputModeEnglish:",
+        "NamingScreen_ApplyTextInputModeTW:",
+        "NamingScreen_ApplyTextInputModeHK:",
+        "NamingScreen_Print1xModeLabel:",
         "IME_TryAddCharacter:",
     ]
     missing_modes = [label for label in mode_labels if label not in name_source]
     errors = []
     if missing_modes:
         errors.append(f"Missing name entry routines: {missing_modes}")
+    for territory, choices in quick_lists.items():
+        missing_glyphs = sorted({ch for ch in choices if ch not in charmap})
+        if missing_glyphs:
+            errors.append(f"{territory} character grid glyphs absent from charmap: {missing_glyphs}")
     for item in examples:
-        if item["missing_in_charmap"] or item["missing_in_pinyin_candidates"]:
-            errors.append(f"{item['name']}: unmapped/unavailable {item['missing_in_charmap']}, "
-                          f"{item['missing_in_pinyin_candidates']}")
+        if item["missing_in_charmap"]:
+            errors.append(f"{item['name']}: missing font glyphs {item['missing_in_charmap']}")
+        # The Pinyin table is a fallback; TW/HK character grids provide an
+        # alternate input path for some, not all, names.
+        in_any_grid = all(ch in quick_lists["TW"] or ch in quick_lists["HK"]
+                          or ch in input_chars for ch in item["name"])
+        if not in_any_grid:
+            errors.append(f"{item['name']}: not typeable via current naming paths")
     return {
-        "available_input_modes": ["Mandarin Pinyin", "English"],
-        "not_yet_implemented": ["Taiwan Zhuyin", "Hong Kong Cangjie", "Quick", "Jyutping", "post-start trainer rename"],
+        "available_input_modes": ["Mandarin Pinyin", "English", "TW common-character grid", "HK common-character grid"],
+        "not_yet_implemented": ["Taiwan Zhuyin", "Hong Kong Cangjie", "Hong Kong Quick Code", "Jyutping", "post-start trainer rename"],
+        "quick_grid_characters": {name: len(chars) for name, chars in quick_lists.items()},
         "sample_name_checks": examples,
         "source_charmap_characters": len(charmap),
         "source_ime_candidate_characters": len(input_chars),
