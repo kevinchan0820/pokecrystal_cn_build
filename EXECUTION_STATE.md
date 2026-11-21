@@ -1,5 +1,16 @@
 # Crystal 1.x — durable execution state
 
+## 2026-11-21 — Cross-chat recovery CI + real player-name Simplified fix (verified)
+
+- **Current canonical new-chat entry:** [AI_HANDOFF.md](AI_HANDOFF.md), assisted by [AGENTS.md](AGENTS.md). Existing hourly automation now reads the canonical handoff first; no duplicate task added.
+- **Fresh successful end-to-end CI:** [#44878037890](https://github.com/kevinchan0820/pokecrystal_cn_build/actions/runs/44878037890), tested source `88c39dc044109e3497e90b3659daa8662a886fa4`, build code `2659ffefc44f48a07baa676d7fc9707982879c00`. All CI steps green, including real PyBoy naming, strict 26-key visuals, clean original build and IPS patch generation.
+- **New machine-readable handoff, VERIFIED:** Artifact `zh_tw_ci_handoff.json` + `zh_tw_ci_handoff.md` + `zh_tw_source_commit.txt` now included automatically. Extracted archive, CRC clean; nine implemented tests passed, four real screen references; `release_ready=false`. Explicitly not all-product acceptance.
+- **PNG source tracing is no longer guesswork:** `zh_tw_asset_reference_report.json` scanned 2,510 source/build files and found `gfx/new_game/name_chinese.png` loaded at `engine/gfx/player_gfx.asm:80` by `ShowPlayerNamingChoices`; this one needs a LIVE PyBoy screenshot and visual review, not merely raster/static checks.
+- **Actual new source FIX:** `data/player_names.asm` originally had Simplified `自己决定` (2), `小阳`, `克丽丝`, `千瑶`. Committed their Taiwan variants `自己決定`, `小陽`, `克麗絲`, `千瑤`. `zh_tw_player_names_report.json`: `verified=true`, `failures=[]`; added to CI and handoff manifest. Existing 1.0 untouched.
+- **RED/GREEN incident:** [#44877902099](https://github.com/kevinchan0820/pokecrystal_cn_build/actions/runs/44877902099) failed because first test parser compared strings including Game Boy's trailing `@` to expected names without terminator. Fixed parser to `removesuffix("@")`, also added missed `千瑤` case. Fresh #44878037890 green against source `88c39dc`. Don't confuse a mistaken test failure with an unmodified ROM fix.
+- **NEXT EXECUTABLE ACTION:** instrument PyBoy naming introduction to capture actual `ShowPlayerNamingChoices` menu, verify Simplified-free labels and the 40×8 title artwork `gfx/new_game/name_chinese.png` visually; if wrong implement RED, fix, retest. Then live Bag/Trainer Card/burned battle screenshots, full practical Quick/Cangjie/Zhuyin dictionary, nickname/SRAM and final editorial screen review. A green CI today is NOT `RELEASE_READY`.
+- This checkpoint records exact test SHA; newer code commits after it must be reverified from live GitHub Actions.
+
 ## 2026-11-21 — asset-reference audit inline-comment RED/GREEN
 
 - Read canonical AI_HANDOFF.md, AGENTS.md, current Superpowers autonomous contract, acceptance and project skill; fetched build/source file contents from the 1.x branch. Earlier #44873879766 is green for source `525f6728ec3d04ede5517fe079a462db72670aab`, build `8ef9e14b5f88640d83e26ce6d1bb8d4d56d12d4f`; it is **not** exact-head proof for this change.
