@@ -65,6 +65,9 @@ jobs:
       - name: Verify real Quick code-to-character input using PyBoy
         if: success()
         run: .venv/bin/python tools/zh_tw_quick_pyboy.py build/pokecrystal11.gbc --source pokecrystal_cn --output . --strict
+      - name: Verify Quick UI does not overlap keyboard and VD yields 好
+        run: .venv/bin/python tools/zh_tw_quick_ui_qa.py build/pokecrystal11.gbc --source pokecrystal_cn --output .
+
       - name: Build verified clean Crystal and generate a patch
         if: success()
         run: |
