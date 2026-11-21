@@ -1,4 +1,4 @@
-name: 1.x Quick full-dictionary compiler (licensed data staging)
+name: 1.x Quick / Cangjie licensed dictionary staging
 on:
   workflow_dispatch:
   push:
@@ -7,6 +7,8 @@ on:
     paths:
       - tools/zh_tw_quick_dictionary_v2.py
       - tools/test_zh_tw_quick_dictionary_v2.py
+      - tools/zh_tw_cangjie_full.py
+      - tools/test_zh_tw_cangjie_full.py
       - .github/workflows/quick-corpus-ci.yml
 
 permissions:
@@ -25,6 +27,8 @@ jobs:
           git -C pokecrystal_cn rev-parse HEAD > generated_source_sha.txt
       - name: Test Quick dictionary compiler and ROM section budget
         run: python3 -m unittest discover -s tools -p 'test_zh_tw_quick_dictionary_v2.py' -v
+      - name: Test Cangjie five-root corpus generator
+        run: python3 -m unittest discover -s tools -p 'test_zh_tw_cangjie_full.py' -v
       - name: Generate full MIT-source, Traditional-only Quick corpus
         run: |
           python3 tools/zh_tw_quick_dictionary_v2.py \
@@ -32,9 +36,14 @@ jobs:
             --output generated/quick_v2_data.asm \
             --report generated/zh_tw_quick_v2_dictionary_report.json \
             --strict
+          python3 tools/zh_tw_cangjie_full.py \
+            --charmap pokecrystal_cn/constants/charmap_cn.asm \
+            --output generated/cangjie_v1_data.asm \
+            --report generated/zh_tw_cangjie_v1_dictionary_report.json \
+            --strict
           curl -fsSL https://raw.githubusercontent.com/cangjie-system/rime-cangjie-integrated/dcfba770189078a2f7b347793c8e155c3c39275d/LICENSE \
             -o generated/LICENSE_CANGJIE_MIT.txt
-          sha256sum generated/quick_v2_data.asm generated/zh_tw_quick_v2_dictionary_report.json \
+          sha256sum generated/quick_v2_data.asm generated/zh_tw_quick_v2_dictionary_report.json generated/cangjie_v1_data.asm generated/zh_tw_cangjie_v1_dictionary_report.json \
             > generated/sha256.txt
       - name: Upload licensed staging data (NOT playable ROM, NOT released IME)
         if: always()
@@ -43,6 +52,8 @@ jobs:
           name: crystal-1x-quick-v2-dictionary-staging
           path: |
             generated/quick_v2_data.asm
+            generated/cangjie_v1_data.asm
+            generated/zh_tw_cangjie_v1_dictionary_report.json
             generated/zh_tw_quick_v2_dictionary_report.json
             generated/LICENSE_CANGJIE_MIT.txt
             generated/sha256.txt
