@@ -28,7 +28,7 @@ def run(rom, source, folder):
     gb = PyBoy(str(rom), symbols=str(sym), window="null", sound_emulated=False)
     gb.set_emulation_speed(0)
     names = ("wNamingScreenLetterCase", "wIMEPinyin", "wIMEMaxLine",
-             "wIMEAddr", "wIMEBank", "wPlayerName", "wNamingScreenCurNameLength",
+             "wIMELine", "wIMEAddr", "wIMEBank", "wPlayerName", "wNamingScreenCurNameLength",
              "wNamingScreenCursorObjectPointer", "wTilemap", "wAttrmap")
     addr = {name: gb.symbol_lookup(name) for name in names}
     entry = []
@@ -349,6 +349,65 @@ def run(rom, source, folder):
         }
         restore(baseline)
 
+        # Real 速成 paging regression: an ambiguous two-root code such as
+        # MM must expose >=3 eight-glyph candidate rows and allow PGDOWN
+        # without modifying the name, overwriting keys, or freezing.
+        key_m = key_v - (ord("V") - ord("M"))
+        route_m1, first_m = find_letter(baseline, key_m, 0)
+        route_m2, second_m = find_letter(first_m, key_m, 1)
+        restore(second_m)
+        if val("wIMEMaxLine") < 3:
+            raise AssertionError("Quick MM full corpus lacks enough candidates to test multi-page UI")
+        if (val("wIMEBank"),
+            val("wIMEAddr") | val("wIMEAddr", 1) << 8) != gb.symbol_lookup("QuickV2_MM"):
+            raise AssertionError("Quick MM index resolved incorrect full-corpus pointer")
+        first_page_image = snapshot("MM_first_page")
+        saved_page0 = gb.screen.image.copy().convert("RGB").crop((24, 88, 152, 127)).tobytes()
+        page_start = state()
+        queue = deque([(page_start, [])])
+        seen = set()
+        scroll_route = None
+        max_states = 70
+        while queue and len(seen) < max_states:
+            candidate_state, navigation = queue.popleft()
+            restore(candidate_state)
+            xy = pos()
+            if xy in seen or xy[1] not in (2, 3):
+                continue
+            seen.add(xy)
+            key("a", 20)
+            if val("wIMELine") > 0:
+                if val("wNamingScreenCurNameLength") != 0:
+                    raise AssertionError("Page arrow wrote a name instead of scrolling candidates")
+                scroll_route = navigation + ["a"]
+                break
+            for direction in ("left", "right", "down", "up"):
+                restore(candidate_state)
+                key(direction, 10)
+                dest = pos()
+                if dest[1] in (2,3) and dest not in seen:
+                    queue.append((state(), navigation + [direction]))
+        if scroll_route is None:
+            raise AssertionError(
+                f"Quick MM has {val('wIMEMaxLine')} candidate rows but no "
+                f"reachable next-page action after exploring {len(seen)} cursor positions")
+        if val("wIMEPinyin") != key_m or val("wIMEPinyin", 1) != key_m:
+            raise AssertionError("Candidate paging corrupted Quick composition buffer")
+        if keyboard() != stable_keys:
+            raise AssertionError("Candidate paging overwrote the 26-root keyboard")
+        after_page = gb.screen.image.copy().convert("RGB").crop((24, 88, 152, 127)).tobytes()
+        if after_page == saved_page0:
+            raise AssertionError("Quick candidate-page index advanced but displayed page did not change")
+        result["scenarios"]["full_dictionary_candidate_paging"] = {
+            "code": "MM", "candidate_rows": val("wIMEMaxLine"),
+            "page_index_after_navigation": val("wIMELine"),
+            "controller_route": scroll_route,
+            "typed_first": route_m1, "typed_second": route_m2,
+            "before": first_page_image, "after": snapshot("MM_scrolled_page"),
+            "name_bytes": 0, "keyboard_preserved": True,
+        }
+        restore(baseline)
+
         path_v, first_state = find_letter(baseline, key_v, 0)
         restore(first_state)
         result["code_V_image"] = snapshot("typed_V")
@@ -389,7 +448,7 @@ def run(rom, source, folder):
         failures.append(type(exc).__name__ + ": " + str(exc))
     finally:
         gb.stop(save=False)
-        result["passed"] = not failures and len(result["scenarios"]) == 4
+        result["passed"] = not failures and len(result["scenarios"]) == 5
         report = folder / "zh_tw_quick_ui_report.json"
         report.write_text(json.dumps(result, ensure_ascii=False, indent=2) + "\n",
                           encoding="utf-8")
