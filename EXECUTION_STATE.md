@@ -1,5 +1,31 @@
 # Crystal 1.x — durable execution state
 
+## Newest checkpoint — 2026-11-21, Traditional raster UI and pocket glyphs
+
+**Product definition:** All user-visible text/glyphs must be Taiwanese/Hong Kong Traditional; actual GBC raster images are as important as Unicode text. Follow [SUPERPOWERS_EXECUTION.md](SUPERPOWERS_EXECUTION.md) and do not stop after a fix until red/green tests, ROM compile, real PyBoy visual review, and a persistent next-action report.
+
+### Completed source changes, only on 1.x (not 1.0)
+- `gfx/naming_screen/selection_chinese.png`: old Simplified `符号／删除` was a bitmap, not editable by OpenCC. Replaced 96×8 art with Taiwan-variant raster `中文符號刪除完成`; proved original 308 changed pixels vs approved TC, now 0 mismatch.
+- `gfx/naming_screen/mode_labels_zh_hant.png`: 120×8 bitmap with five Traditional headers `拼音／英文／臺灣／香港／速成`; previous English QUICK was only a temporary fix for clipped Han text.
+- `engine/menus/naming_screen.asm`: use 15 dedicated tiles at $6e..$7c for real Traditional headers, in a separate auto-placed ROMX section (`PUSHS/SECTION/POPS`). Original placement overflowed debug bank4 by two bytes; root cause fixed.
+- `gfx/pack/pack_menu.png`: discovered with real `gfx/pack/pack_menu.tilemap` reconstruction that pocket title was Simplified `精灵球`. Changed the 12 unique atlas tiles for that title to Taiwan-variant `精靈球` using face3 at 16px. Original tilemap reconstructor reproduces failure, corrected image passes exactly.
+- `tools/zh_tw_toolbar_bitmap_audit.py`: compares both naming bitmaps char-by-char against NotoSansCJK-Regular TTC Taiwan face #3.
+- `tools/zh_tw_pack_pocket_qa.py`: reassembles the **actual** pack tilemap and rejects any non-approved `精靈球` glyph pixels.
+- `tools/build_zh_tw.sh`: checks title logo, toolbar, mode labels, and pocket image before the costly ROM compilation.
+- `tools/zh_tw_quick_ui_qa.py`: PyBoy test expects actual Traditional `速成` tile IDs (0x7a..7c), keeps code→candidate→name test `VD→好` and keyboard integrity.
+
+### Last verified / latest activity
+- **Previously verified exact-head run**: [#44867251486](https://github.com/kevinchan0820/pokecrystal_cn_build/actions/runs/44867251486), **success** after fixing bank4 overflow, with real PyBoy showing the new Traditional toolbar, mode text and code `VD→好`.
+- **Pending the final pocket sprite + combined gates**: [#44867512509](https://github.com/kevinchan0820/pokecrystal_cn_build/actions/runs/44867512509), source should be `kevinchan0820/pokecrystal_cn` commit `a697ef71b379a9dfa6a186906d7c96c4e96b0bb3` and build head `c29146fad887411474a618f5222ec349f7ea6a2b`. **Must READ outcome before claiming complete; correct first failure if any.**
+- Prior complete text audit scanned 22,422 translated workbook strings, 4,130 displayed ASM strings across 2,471 ASM files; mechanical Simplified detection pass but `editorial_qa_complete: false`. Also 27 OpenCC non-idempotent proper terms requiring nuanced human linguistic review, not blind auto-conversion.
+
+### What remains / next action (important)
+1. Check **current latest** CI run (do not assume a past success). If failed, read actual failed job logs, fix root cause and rerun. Verify `zh_tw_pack_pocket_audit_report.json` and `zh_tw_toolbar_bitmap_audit_report.json`.
+2. Inspect latest **real PyBoy** screenshot for labels, name `好` and any clipping. Bag `精靈球` so far passes tilemap pixel reconstruction, but actual **in-game bag page** still needs PyBoy screenshot acceptance.
+3. Review `gfx/new_game/name_chinese.png` and any other referenced text-bearing PNG, classify used vs unused. Do not claim all pictures are localized before this inspection and multi-scene gameplay QA.
+4. Continue proper Quick vocabulary (not just five test codes), multiple candidates, paging, save/load, Pokémon nickname, and then genuine Taiwan Zhuyin. Release gate remains **BLOCKED** until full functional, visual and linguistic acceptance.
+5. Keep existing hourly automation, do not create duplicates or merge to 1.0.
+
 State: **IN PROGRESS (not a release)**
 
 ## Latest verified checkpoint — 2026-11-21, UI repaired but NOT release-ready
