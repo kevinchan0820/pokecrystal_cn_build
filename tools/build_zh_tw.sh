@@ -29,6 +29,12 @@ git -C pokecrystal_cn checkout --detach FETCH_HEAD
 echo "Using 1.x source: $SOURCE_BRANCH ($(git -C pokecrystal_cn rev-parse --short HEAD))"
 # Fail before building if the original Simplified title graphic is still present.
 python3 tools/zh_tw_title_check.py
+# Screen labels are bitmap glyphs (not OpenCC text), so verify the
+# actual 96x8 pixel source was drawn with Taiwan Traditional font face.
+python3 tools/zh_tw_toolbar_bitmap_audit.py \
+  --source pokecrystal_cn \
+  --font "$FONT_FILE" \
+  --report zh_tw_toolbar_bitmap_audit_report.json
 python3 tools/zh_tw_prepare.py \
   --input text.xlsx \
   --output text.zh-TW.xlsx \
