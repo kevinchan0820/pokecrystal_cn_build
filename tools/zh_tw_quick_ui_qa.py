@@ -68,8 +68,13 @@ def run(rom, source, folder):
                 for row in (8, 9, 10) for col in range(20)]
 
     def snapshot(name):
+        # Preserve the real 160x144 PyBoy frame and a pixel-faithful 4x
+        # nearest-neighbor copy for human inspection of 8x8 radicals.
         file = folder / f"zh_tw_quick_ui_{name}.png"
-        gb.screen.image.copy().save(file)
+        frame = gb.screen.image.copy()
+        frame.save(file)
+        zoom = folder / f"zh_tw_quick_ui_{name}_4x.png"
+        frame.resize((640, 576), resample=0).save(zoom)
         return file.name
 
     def find_letter(saved, wanted, nth, max_states=105):
