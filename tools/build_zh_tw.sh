@@ -34,6 +34,11 @@ git -C pokecrystal_cn rev-parse HEAD > zh_tw_source_commit.txt
 python3 tools/zh_tw_asset_reference_audit.py \
   --source pokecrystal_cn \
   --report zh_tw_asset_reference_report.json
+# These preset names are compiled from ASM (not imported from the XLSX).
+# Fail if Mainland Simplified source labels regress.
+python3 tools/zh_tw_player_name_menu_qa.py \
+  --source pokecrystal_cn \
+  --report zh_tw_player_names_report.json
 # Rime-referenced 倉頡 keyboard must preserve English 8px dimensions.
 # This is intentionally a RED/GREEN release gate, not documentation only.
 python3 tools/zh_tw_cangjie_keyboard_qa.py \
