@@ -295,6 +295,54 @@ def run(rom, source, folder):
             "invalid_screen": invalid_png, "backspace_cleared": True,
         }
         restore(baseline)
+        # Same-code ambiguity must be real, not merely a static picker:
+        # Rime's MIT-licensed Cangjie base has both a->日 and a->曰.
+        # After typing the actual A key, cursor navigation should let
+        # the player select *either* candidate, including the second.
+        key("a", 40)
+        single_pointer = (val("wIMEBank"),
+                          val("wIMEAddr") | val("wIMEAddr", 1) << 8)
+        if single_pointer != gb.symbol_lookup("QuickCandidatesA"):
+            raise AssertionError(f"Quick A doesn't resolve to its multiple candidates: {single_pointer}")
+        if val("wIMEMaxLine") != 1:
+            raise AssertionError("Quick A multi-candidate list missing its candidate row")
+        one_code_state = state()
+        multi_view = snapshot("A_multiple_candidates")
+        expected_second = char_code(source / "constants/charmap_cn.asm", "曰")
+        # Cursor starts at A, row0. Down+down reaches candidate row,
+        # and two horizontal moves should reach the second 12x12 glyph.
+        candidates = (
+            ("down", "down", "right", "right"),
+            ("down", "down", "right"),
+            ("down", "down", "right", "right", "right"),
+            ("right", "down", "down", "right"),
+            ("down", "down", "right", "right", "right", "right"),
+        )
+        found_second = False
+        used_route = []
+        for route in candidates:
+            restore(one_code_state)
+            for direction in route:
+                key(direction, 20)
+            key("a", 45)
+            candidate_bytes = [val("wPlayerName"), val("wPlayerName", 1)]
+            if val("wNamingScreenCurNameLength") == 2 and candidate_bytes == expected_second:
+                if val("wPlayerName", 2) != 0x50:
+                    raise AssertionError("Second Quick glyph overwrote player-name terminator")
+                used_route = list(route)
+                found_second = True
+                break
+        if not found_second:
+            raise AssertionError("Quick A shows 日/曰 but controller cannot pick second candidate 曰")
+        result["scenarios"]["same_code_multiple_candidates"] = {
+            "code": "A", "candidate_list": "日曰", "selected": "曰",
+            "candidate_screenshot": multi_view,
+            "selected_screenshot": snapshot("A_selected_YUE"),
+            "selection_route": used_route,
+            "name_bytes": expected_second,
+            "terminator_intact": True,
+        }
+        restore(baseline)
 
         path_v, first_state = find_letter(baseline, key_v, 0)
         restore(first_state)
@@ -336,7 +384,7 @@ def run(rom, source, folder):
         failures.append(type(exc).__name__ + ": " + str(exc))
     finally:
         gb.stop(save=False)
-        result["passed"] = not failures and len(result["scenarios"]) == 3
+        result["passed"] = not failures and len(result["scenarios"]) == 4
         report = folder / "zh_tw_quick_ui_report.json"
         report.write_text(json.dumps(result, ensure_ascii=False, indent=2) + "\n",
                           encoding="utf-8")
